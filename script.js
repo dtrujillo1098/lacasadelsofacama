@@ -17,13 +17,45 @@ const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, ''
 function filterProducts() {
   let count = 0;
   const query = normalize(search.value.trim());
-  document.querySelectorAll('.product-card').forEach(card => {
+  document.querySelectorAll('#products .product-card').forEach(card => {
     const visible = (category === 'all' || card.dataset.category === category) && normalize(card.dataset.name).includes(query);
     card.hidden = !visible;
     if (visible) count++;
   });
-  document.querySelector('#empty-results').hidden = count > 0;
-  document.querySelector('#result-count').textContent = `${count} ${count === 1 ? 'modelo' : 'modelos'}`;
+  const groups = [{name:'Sofacamas',id:'coleccion',count}];
+  let total = count;
+  document.querySelectorAll('.new-line').forEach(section => {
+    let hits = 0;
+    section.querySelectorAll('.line-product').forEach(card => {
+      const visible = normalize(card.dataset.lineName).includes(query);
+      card.hidden = !visible;
+      if(visible) hits++;
+    });
+    section.hidden = Boolean(query) && hits === 0;
+    groups.push({name:section.querySelector('.eyebrow').textContent.replace(/^0[2-4] \/ /,''),id:section.id,count:hits});
+    total += hits;
+  });
+  const overview = document.querySelector('#search-overview');
+  overview.replaceChildren();
+  overview.hidden = !query;
+  if(query) {
+    const message = document.createElement('p');
+    message.textContent = total + (total === 1 ? ' producto encontrado' : ' productos encontrados') + ' en las colecciones:';
+    overview.appendChild(message);
+    const results = document.createElement('div');
+    results.className = 'search-category-results';
+    groups.filter(group=>group.count>0).forEach(group => {
+      const link = document.createElement('a');
+      link.href = '#' + group.id;
+      link.textContent = group.name + ' (' + group.count + ') ↗';
+      results.appendChild(link);
+    });
+    overview.appendChild(results);
+  }
+  const empty = document.querySelector('#empty-results');
+  empty.hidden = count > 0;
+  empty.textContent = total > 0 ? 'No hay sofacamas que coincidan. Puedes explorar los resultados de las otras colecciones.' : 'No encontramos ese modelo. Prueba otro nombre o selecciona “Ver todos”.';
+  document.querySelector('#result-count').textContent = query ? total + ' productos encontrados' : count + ' sofacamas';
 }
 document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
   category = button.dataset.filter;
@@ -68,7 +100,7 @@ function selectFabric(productIndex, fabricIndex) {
   fabricSelections[productIndex] = fabricIndex;
   const product = products[productIndex];
   const fabric = chosenFabric(productIndex);
-  const card = document.querySelectorAll('.product-card')[productIndex];
+  const card = document.querySelectorAll('#products .product-card')[productIndex];
   const cardImage = card.querySelector('.product-image img');
   cardImage.src = fabric.image;
   cardImage.alt = 'Sofá cama ' + product.name + ', ' + fabric.name + ', color ' + fabric.color;
@@ -88,7 +120,7 @@ function bindFabricButtons(container) {
 }
 bindFabricButtons(document.querySelector('#products'));
 products.forEach((product,i) => {
-  const card = document.querySelectorAll('.product-card')[i];
+  const card = document.querySelectorAll('#products .product-card')[i];
   card.dataset.name += ' ' + product.fabrics.map(f=>f.name + ' ' + f.color).join(' ');
 });
 document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => {
@@ -198,3 +230,49 @@ document.querySelectorAll('[data-slide], #banner-prev, #banner-next').forEach(bu
 });
 document.addEventListener('visibilitychange', startBannerRotation);
 startBannerRotation();
+
+// Reuse existing search and bag behavior from the utility bar.
+document.querySelector('#utility-search').addEventListener('click', () => document.querySelector('#search-toggle').click());
+document.querySelector('#utility-cart').addEventListener('click', () => document.querySelector('#cart-toggle').click());
+
+// Separate product details for the three additional furniture lines.
+const lineDialog = document.querySelector('#line-dialog');
+document.querySelectorAll('[data-line-product]').forEach(button => button.addEventListener('click', () => {
+  const item = newLineProducts.find(product=>product.id === button.dataset.lineProduct);
+  document.querySelector('#line-detail-title').textContent = item.name;
+  document.querySelector('#line-detail-category').textContent = item.lineName + ' · ' + item.type;
+  document.querySelector('#line-detail-description').textContent = item.description;
+  document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
+  const photo = document.querySelector('#line-detail-image');
+  photo.src = item.image;
+  photo.alt = item.name + ', ' + item.type + ', ' + item.color;
+  openDialog(lineDialog);
+  lineDialog.scrollTop = 0;
+}));
+document.querySelector('#line-detail-close').addEventListener('click', () => lineDialog.close());
+document.querySelectorAll('.category-tile, #main-nav a, .footer-top a[href="#coleccion"], .footer-top a[href="#salas"], .footer-top a[href="#sillas-auxiliares"], .footer-top a[href="#camas"]').forEach(link => link.addEventListener('click', () => {
+  search.value = '';
+  category = 'all';
+  document.querySelectorAll('[data-filter]').forEach(button => {
+    const active = button.dataset.filter === 'all';
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+  filterProducts();
+}));
+
+
+// Mobile search shares the catalogue search; dismiss the menu before navigating.
+document.querySelector('#mobile-menu-search').addEventListener('click', () => {
+  if(menu.getAttribute('aria-expanded') === 'true') menu.click();
+  document.querySelector('#search-toggle').click();
+});
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { menu.click(); menu.focus(); }
+});
+document.addEventListener('click', event => {
+  if(menu.getAttribute('aria-expanded') === 'true' && !document.querySelector('.header').contains(event.target)) menu.click();
+});
+window.matchMedia('(max-width:960px)').addEventListener('change', event => {
+  if(!event.matches && menu.getAttribute('aria-expanded') === 'true') menu.click();
+});
