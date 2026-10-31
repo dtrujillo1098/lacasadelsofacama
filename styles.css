@@ -111,3 +111,10 @@
 .header #main-nav>a{color:#3d302a;font-weight:600}
 .header #main-nav>a:hover{color:#6b4d38;text-decoration:underline;text-underline-offset:6px}
 @media(max-width:960px){.header nav{background:#faf7f2}.header nav .mobile-menu-extras a{color:#3d302a}.header nav{max-height:calc(100svh - 110px)}}
+
+/* Soft, unadorned category calls to action in the hero banners. */
+.hero .hero-copy .button.light{justify-content:center;gap:0;min-width:220px;max-width:100%;min-height:54px;padding:17px 30px;border-radius:999px;background:rgba(250,247,242,.94);border:1px solid rgba(250,247,242,.65);color:#4b382d;font-size:12px;font-weight:500;letter-spacing:.6px;line-height:1.5;text-align:center;box-shadow:0 6px 22px rgba(46,35,28,.12);transition:background-color .25s,border-color .25s,box-shadow .25s,transform .25s;filter:none}
+.hero .hero-copy .button.light:hover{background:#e9dccc;border-color:#e9dccc;box-shadow:0 9px 26px rgba(46,35,28,.19);transform:translateY(-2px);filter:none}
+.hero .hero-copy .button.light:active{transform:translateY(0);box-shadow:0 3px 12px rgba(46,35,28,.12)}
+.hero .hero-copy .button.light:focus-visible{outline:2px solid #fff7ed;outline-offset:5px}
+@media(max-width:520px){.hero .hero-copy .button.light{min-width:205px;min-height:50px;padding:15px 25px;font-size:11px}}

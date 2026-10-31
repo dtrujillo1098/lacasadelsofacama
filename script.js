@@ -1,78 +1,94 @@
+const siteBase = document.body.dataset.siteBase || './';
+const siteUrl = value => siteBase + value.replace(/^\.\//, '');
+const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const menu = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#main-nav');
-menu.addEventListener('click', () => {
+function closeMenu() {
+  menu?.setAttribute('aria-expanded', 'false');
+  menu?.setAttribute('aria-label', 'Abrir menú');
+  nav?.classList.remove('is-open');
+}
+menu?.addEventListener('click', () => {
   const open = menu.getAttribute('aria-expanded') !== 'true';
   menu.setAttribute('aria-expanded', String(open));
   menu.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
   nav.classList.toggle('is-open', open);
 });
-nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-  menu.setAttribute('aria-expanded', 'false');
-  menu.setAttribute('aria-label', 'Abrir menú');
-  nav.classList.remove('is-open');
-}));
-const search = document.querySelector('#search');
-let category = 'all';
-const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-function filterProducts() {
-  let count = 0;
-  const query = normalize(search.value.trim());
-  document.querySelectorAll('#products .product-card').forEach(card => {
-    const visible = (category === 'all' || card.dataset.category === category) && normalize(card.dataset.name).includes(query);
-    card.hidden = !visible;
-    if (visible) count++;
-  });
-  const groups = [{name:'Sofacamas',id:'coleccion',count}];
-  let total = count;
-  document.querySelectorAll('.new-line').forEach(section => {
-    let hits = 0;
-    section.querySelectorAll('.line-product').forEach(card => {
-      const visible = normalize(card.dataset.lineName).includes(query);
-      card.hidden = !visible;
-      if(visible) hits++;
-    });
-    section.hidden = Boolean(query) && hits === 0;
-    groups.push({name:section.querySelector('.eyebrow').textContent.replace(/^0[2-4] \/ /,''),id:section.id,count:hits});
-    total += hits;
-  });
-  const overview = document.querySelector('#search-overview');
-  overview.replaceChildren();
-  overview.hidden = !query;
-  if(query) {
-    const message = document.createElement('p');
-    message.textContent = total + (total === 1 ? ' producto encontrado' : ' productos encontrados') + ' en las colecciones:';
-    overview.appendChild(message);
-    const results = document.createElement('div');
-    results.className = 'search-category-results';
-    groups.filter(group=>group.count>0).forEach(group => {
-      const link = document.createElement('a');
-      link.href = '#' + group.id;
-      link.textContent = group.name + ' (' + group.count + ') ↗';
-      results.appendChild(link);
-    });
-    overview.appendChild(results);
-  }
-  const empty = document.querySelector('#empty-results');
-  empty.hidden = count > 0;
-  empty.textContent = total > 0 ? 'No hay sofacamas que coincidan. Puedes explorar los resultados de las otras colecciones.' : 'No encontramos ese modelo. Prueba otro nombre o selecciona “Ver todos”.';
-  document.querySelector('#result-count').textContent = query ? total + ' productos encontrados' : count + ' sofacamas';
-}
-document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
-  category = button.dataset.filter;
-  document.querySelectorAll('[data-filter]').forEach(item => {
-    const active = item === button;
-    item.classList.toggle('active', active);
-    item.setAttribute('aria-pressed', String(active));
-  });
-  filterProducts();
-}));
-search.addEventListener('input', filterProducts);
-document.querySelector('#search-toggle').addEventListener('click', () => {
-  document.querySelector('#coleccion').scrollIntoView();
-  search.focus({ preventScroll: true });
+nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape' && menu?.getAttribute('aria-expanded') === 'true') { closeMenu(); menu.focus(); }
 });
+document.addEventListener('click', event => {
+  if(menu?.getAttribute('aria-expanded') === 'true' && !event.target.closest('.header')) closeMenu();
+});
+window.matchMedia('(max-width:960px)').addEventListener('change', event => { if(!event.matches) closeMenu(); });
+function openDialog(dialog) { if(!dialog) return; dialog.showModal(); document.body.classList.add('modal-open'); }
+document.querySelectorAll('dialog').forEach(dialog => {
+  dialog.querySelector('.close')?.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => { if(!document.querySelector('dialog[open]')) document.body.classList.remove('modal-open'); });
+  dialog.addEventListener('click', event => {
+    const rect = dialog.getBoundingClientRect();
+    if(event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
+  });
+});
+const cart = document.querySelector('#cart-dialog');
+document.querySelectorAll('#cart-toggle, #utility-cart').forEach(button => button.addEventListener('click', () => { closeMenu(); openDialog(cart); }));
+document.querySelector('#cart-explore')?.addEventListener('click', () => {
+  cart.close();
+  const overview = document.querySelector('#categorias');
+  if(overview) overview.scrollIntoView(); else window.location.assign(siteUrl('index.html#categorias'));
+});
+
+const categoryPages = [
+  {name:'Sofacamas',file:'sofacamas.html'},
+  {name:'Salas',file:'salas.html'},
+  {name:'Sillas auxiliares',file:'sillas-auxiliares.html'},
+  {name:'Camas',file:'camas.html'}
+];
+const allSearchProducts = [
+  ...products.map(product => ({id:product.id,name:product.name,type:'Sofacama',category:'Sofacamas',file:'sofacamas.html',image:product.photos[0].src,terms:[product.name,'sofacama sofá cama sofacamas',product.color,...product.fabrics.map(f=>f.name+' '+f.color)].join(' ')})),
+  ...newLineProducts.map(product => ({...product,category:product.lineName,file:product.line+'.html',terms:[product.name,product.type,product.color,product.lineName].join(' ')}))
+];
+const searchDialog = document.querySelector('#search-dialog');
+const globalSearchInput = document.querySelector('#global-search-input');
+const globalSearchResults = document.querySelector('#global-search-results');
+function renderGlobalSearch() {
+  const query = normalize(globalSearchInput.value.trim());
+  globalSearchResults.replaceChildren();
+  const matches = query ? allSearchProducts.filter(product=>normalize(product.terms).includes(query)) : [];
+  document.querySelector('#global-search-status').textContent = !query ? 'Escribe un nombre, tipo de mueble o color.' : matches.length ? matches.length + (matches.length === 1 ? ' producto encontrado' : ' productos encontrados') : 'No encontramos coincidencias. Prueba otro nombre o explora las categorías.';
+  matches.forEach(product => {
+    const link = document.createElement('a');
+    link.className = 'global-search-result';
+    link.href = siteUrl(product.file) + '?producto=' + encodeURIComponent(product.id);
+    const image = document.createElement('img'); image.src = siteUrl(product.image); image.alt = ''; image.width = 70; image.height = 70;
+    const copy = document.createElement('div');
+    const label = document.createElement('small'); label.textContent = product.category;
+    const name = document.createElement('strong'); name.textContent = product.name;
+    const note = document.createElement('span'); note.textContent = 'Modelo provisional · Ver detalles';
+    copy.append(label,name,note); link.append(image,copy); globalSearchResults.appendChild(link);
+  });
+}
+function openSearch() { closeMenu(); openDialog(searchDialog); renderGlobalSearch(); globalSearchInput.focus(); }
+document.querySelectorAll('#search-toggle, #utility-search, #mobile-menu-search').forEach(button => button.addEventListener('click', openSearch));
+globalSearchInput?.addEventListener('input', renderGlobalSearch);
+document.querySelector('#global-search-form')?.addEventListener('submit', event => { event.preventDefault(); renderGlobalSearch(); });
+const requestedProduct = new URLSearchParams(window.location.search).get('producto');
+
+const sofaGrid = document.querySelector('#products');
 const detail = document.querySelector('#product-dialog');
-function openDialog(dialog) { dialog.showModal(); document.body.classList.add('modal-open'); }
+if(sofaGrid && detail) {
+  const search = document.querySelector('#search');
+  let category = 'all';
+  function filterProducts() {
+    let count = 0; const query = normalize(search.value.trim());
+    sofaGrid.querySelectorAll('.product-card').forEach(card => { card.hidden = !((category === 'all' || card.dataset.category === category) && normalize(card.dataset.name).includes(query)); if(!card.hidden) count++; });
+    document.querySelector('#empty-results').hidden = count > 0;
+    document.querySelector('#empty-results').textContent = 'No encontramos ese sofacama. Prueba otro nombre o selecciona “Ver todos”.';
+    document.querySelector('#result-count').textContent = count + ' sofacamas';
+  }
+  search.addEventListener('input',filterProducts);
+  document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click',()=>{category=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(other=>{const active=other===button;other.classList.toggle('active',active);other.setAttribute('aria-pressed',String(active));});filterProducts();}));
 let selectedProduct = null;
 let selectedProductIndex = -1;
 let selectedPhoto = 0;
@@ -180,99 +196,55 @@ detail.addEventListener('keydown', event => {
     showProductPhoto(selectedPhoto + (event.key === 'ArrowLeft' ? -1 : 1));
   }
 });
-const cart = document.querySelector('#cart-dialog');
-document.querySelector('#cart-toggle').addEventListener('click', () => openDialog(cart));
-document.querySelector('#back-to-catalog').addEventListener('click', () => detail.close());
-document.querySelector('#cart-explore').addEventListener('click', () => {
-  cart.close(); document.querySelector('#coleccion').scrollIntoView();
-});
-document.querySelectorAll('dialog').forEach(dialog => {
-  dialog.querySelector('.close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => document.body.classList.remove('modal-open'));
-  dialog.addEventListener('click', event => {
-    const rect = dialog.getBoundingClientRect();
-    if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
-  });
-});
 
-// Carousel rotates every 3.5 seconds; manual controls restart the interval.
-const slides = Array.from(document.querySelectorAll('.hero-slide'));
-const slideButtons = Array.from(document.querySelectorAll('[data-slide]'));
-const captions = ['SALA PRINCIPAL', 'APARTAMENTO COMPACTO', 'HABITACIÓN DE INVITADOS'];
-let activeSlide = 0;
-function showSlide(index) {
-  activeSlide = (index + slides.length) % slides.length;
-  slides.forEach((slide, i) => { slide.hidden = i !== activeSlide; });
-  slideButtons.forEach((button, i) => {
-    if (i === activeSlide) button.setAttribute('aria-current', 'true');
-    else button.removeAttribute('aria-current');
-  });
-  document.querySelector('#banner-caption').textContent = captions[activeSlide];
-  document.querySelector('#banner-count').textContent = `${String(activeSlide + 1).padStart(2, '0')} / 03`;
+  document.querySelector('#back-to-catalog').addEventListener('click',()=>detail.close());
+  if(requestedProduct) { const index = products.findIndex(product=>product.id===requestedProduct); if(index>=0) document.querySelector('[data-product="'+index+'"]').click(); }
 }
-slideButtons.forEach(button => button.addEventListener('click', () => showSlide(Number(button.dataset.slide))));
-document.querySelector('#banner-prev').addEventListener('click', () => showSlide(activeSlide - 1));
-document.querySelector('#banner-next').addEventListener('click', () => showSlide(activeSlide + 1));
-document.querySelector('[data-banner-filter]').addEventListener('click', () => {
-  search.value = '';
-  document.querySelector('[data-filter="compacto"]').click();
-});
 
-let bannerTimer;
-function startBannerRotation() {
-  clearInterval(bannerTimer);
-  if (!document.hidden) {
-    bannerTimer = setInterval(() => showSlide(activeSlide + 1), 3500);
-  }
-}
-document.querySelectorAll('[data-slide], #banner-prev, #banner-next').forEach(button => {
-  button.addEventListener('click', startBannerRotation);
-});
-document.addEventListener('visibilitychange', startBannerRotation);
-startBannerRotation();
 
-// Reuse existing search and bag behavior from the utility bar.
-document.querySelector('#utility-search').addEventListener('click', () => document.querySelector('#search-toggle').click());
-document.querySelector('#utility-cart').addEventListener('click', () => document.querySelector('#cart-toggle').click());
-
-// Separate product details for the three additional furniture lines.
 const lineDialog = document.querySelector('#line-dialog');
-document.querySelectorAll('[data-line-product]').forEach(button => button.addEventListener('click', () => {
-  const item = newLineProducts.find(product=>product.id === button.dataset.lineProduct);
-  document.querySelector('#line-detail-title').textContent = item.name;
-  document.querySelector('#line-detail-category').textContent = item.lineName + ' · ' + item.type;
-  document.querySelector('#line-detail-description').textContent = item.description;
-  document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
-  const photo = document.querySelector('#line-detail-image');
-  photo.src = item.image;
-  photo.alt = item.name + ', ' + item.type + ', ' + item.color;
-  openDialog(lineDialog);
-  lineDialog.scrollTop = 0;
-}));
-document.querySelector('#line-detail-close').addEventListener('click', () => lineDialog.close());
-document.querySelectorAll('.category-tile, #main-nav a, .footer-top a[href="#coleccion"], .footer-top a[href="#salas"], .footer-top a[href="#sillas-auxiliares"], .footer-top a[href="#camas"]').forEach(link => link.addEventListener('click', () => {
-  search.value = '';
-  category = 'all';
-  document.querySelectorAll('[data-filter]').forEach(button => {
-    const active = button.dataset.filter === 'all';
-    button.classList.toggle('active',active);
-    button.setAttribute('aria-pressed',String(active));
-  });
-  filterProducts();
-}));
+if(lineDialog) {
+  function openLineProduct(id) {
+    const item = newLineProducts.find(product => product.id === id);
+    if(!item || !document.querySelector('[data-line-product="'+id+'"]')) return;
+    document.querySelector('#line-detail-title').textContent = item.name;
+    document.querySelector('#line-detail-category').textContent = item.lineName + ' · ' + item.type;
+    document.querySelector('#line-detail-description').textContent = item.description;
+    document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
+    const image = document.querySelector('#line-detail-image'); image.src = siteUrl(item.image); image.alt = item.name + ', ' + item.color;
+    openDialog(lineDialog); lineDialog.scrollTop = 0;
+  }
+  document.querySelectorAll('[data-line-product]').forEach(button => button.addEventListener('click', () => openLineProduct(button.dataset.lineProduct)));
+  document.querySelector('#line-detail-close').addEventListener('click', () => lineDialog.close());
+  if(requestedProduct) openLineProduct(requestedProduct);
+}
+const lineSearch = document.querySelector('#line-search');
+if(lineSearch) lineSearch.addEventListener('input', () => {
+  const query = normalize(lineSearch.value.trim()); let count = 0;
+  document.querySelectorAll('.line-product').forEach(card => { card.hidden = !normalize(card.dataset.lineName).includes(query); if(!card.hidden) count++; });
+  document.querySelector('#line-search-status').textContent = count + (count === 1 ? ' modelo' : ' modelos');
+  document.querySelector('#line-empty').hidden = count > 0;
+});
 
-
-// Mobile search shares the catalogue search; dismiss the menu before navigating.
-document.querySelector('#mobile-menu-search').addEventListener('click', () => {
-  if(menu.getAttribute('aria-expanded') === 'true') menu.click();
-  document.querySelector('#search-toggle').click();
-});
-document.addEventListener('keydown', event => {
-  if(event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { menu.click(); menu.focus(); }
-});
-document.addEventListener('click', event => {
-  if(menu.getAttribute('aria-expanded') === 'true' && !document.querySelector('.header').contains(event.target)) menu.click();
-});
-window.matchMedia('(max-width:960px)').addEventListener('change', event => {
-  if(!event.matches && menu.getAttribute('aria-expanded') === 'true') menu.click();
-});
+const slides = Array.from(document.querySelectorAll('.hero-slide'));
+if(slides.length) {
+  const buttons = Array.from(document.querySelectorAll('[data-slide]'));
+  let activeSlide = 0, timer;
+  function showSlide(index) {
+    activeSlide = (index + slides.length) % slides.length;
+    slides.forEach((slide,i) => { slide.hidden = i !== activeSlide; });
+    buttons.forEach((button,i) => { if(i === activeSlide) button.setAttribute('aria-current','true'); else button.removeAttribute('aria-current'); });
+    document.querySelector('#banner-caption').textContent = slides[activeSlide].dataset.caption;
+    document.querySelector('#banner-count').textContent = String(activeSlide+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+  }
+  function startRotation() { clearInterval(timer); if(!document.hidden) timer = setInterval(() => showSlide(activeSlide+1),3500); }
+  buttons.forEach(button=>button.addEventListener('click',()=>{showSlide(Number(button.dataset.slide));startRotation();}));
+  document.querySelector('#banner-prev').addEventListener('click',()=>{showSlide(activeSlide-1);startRotation();});
+  document.querySelector('#banner-next').addEventListener('click',()=>{showSlide(activeSlide+1);startRotation();});
+  document.addEventListener('visibilitychange',startRotation); startRotation();
+}
+if(document.body.dataset.page === 'inicio') {
+  const legacyPages = {coleccion:'sofacamas.html',salas:'salas.html','sillas-auxiliares':'sillas-auxiliares.html',camas:'camas.html',nosotros:'nosotros.html',guia:'sofacamas.html#guia',inspiracion:'blog/index.html',blog:'blog/index.html'};
+  const destination = legacyPages[window.location.hash.slice(1)];
+  if(destination) window.location.replace(siteUrl(destination));
+}
