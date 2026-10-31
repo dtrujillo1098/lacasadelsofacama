@@ -1,7 +1,7 @@
 // Conexión con la tienda Shopify. Cambia shopifyEnabled a true cuando los
 // productos tengan precio real y estén activos en Shopify.
 const shopifyStore = 'xxwsyt-j3.myshopify.com';
-const shopifyEnabled = false || new URLSearchParams(window.location.search).get('shopify') === '1';
+const shopifyEnabled = true || new URLSearchParams(window.location.search).get('shopify') === '1';
 const shopifyVariants = {
   'sofacama-brisa-original': '67848184955014', 'sofacama-brisa-lino': '67848184987782', 'sofacama-brisa-terciopelo': '67848185020550', 'sofacama-brisa-chenilla': '67848185053318',
   'sofacama-olivo-original': '67848189739142', 'sofacama-olivo-lino': '67848189771910', 'sofacama-olivo-terciopelo': '67848189804678', 'sofacama-olivo-chenilla': '67848189837446',
