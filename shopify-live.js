@@ -54,6 +54,18 @@ function updateBuyButton(container, sku, before) {
     link.target = '_blank';
     link.rel = 'noopener';
     link.textContent = 'Agregar al carrito ↗';
+  }
+  const price = container.querySelector('.product-price, .line-meta strong');
+  if (price) {
+    let row = price.closest('.purchase-row');
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'purchase-row';
+      price.before(row);
+      row.append(price);
+    }
+    row.append(link);
+  } else {
     const anchor = before && container.querySelector(before);
     if (anchor) anchor.before(link); else container.append(link);
   }
