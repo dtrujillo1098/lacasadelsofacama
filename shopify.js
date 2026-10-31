@@ -22,11 +22,25 @@ const shopifyVariants = {
   'silla-aura': '67848203042950', 'silla-nara': '67848203108486', 'silla-vega': '67848203141254',
   'cama-serena': '67848203174022', 'cama-cala': '67848203960454', 'cama-noche': '67848203993222'
 };
+// Los precios viven en precios.json, que se sincroniza desde el admin de Shopify.
+let shopifyPrices = {};
+const priceSelector = '.product-price, .line-meta strong';
+function applyPrice(container) {
+  const label = container.querySelector(priceSelector);
+  const price = shopifyPrices[container.dataset.sku];
+  if(label && price !== undefined) label.textContent = '$' + Number(price).toLocaleString('es-CO') + ' COP';
+}
+fetch('./precios.json').then(response => response.json()).then(prices => {
+  shopifyPrices = prices;
+  document.querySelectorAll('[data-sku]').forEach(applyPrice);
+}).catch(() => {});
 // Agrega o actualiza el botón "Agregar al carrito" de un producto: agrega la
 // variante al carrito de Shopify y abre el carrito. `before` es el selector del
 // elemento antes del cual se inserta; sin él, el botón va al final del contenedor.
 function updateBuyButton(container, sku, before) {
   if(!container) return;
+  container.dataset.sku = sku;
+  applyPrice(container);
   let link = container.querySelector('.buy-link');
   const variant = shopifyVariants[sku];
   if(!shopifyEnabled || !variant) { link?.remove(); return; }
