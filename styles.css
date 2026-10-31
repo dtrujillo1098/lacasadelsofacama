@@ -120,3 +120,4 @@
 @media(max-width:520px){.hero .hero-copy .button.light{min-width:205px;min-height:50px;padding:15px 25px;font-size:11px}}
 
 .detail-copy .buy-link{display:inline-flex;margin:0 .75rem .75rem 0}
+.product-card .buy-link,.line-product .buy-link{display:inline-flex;margin-top:.75rem}

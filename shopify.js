@@ -22,8 +22,10 @@ const shopifyVariants = {
   'silla-aura': '67848203042950', 'silla-nara': '67848203108486', 'silla-vega': '67848203141254',
   'cama-serena': '67848203174022', 'cama-cala': '67848203960454', 'cama-noche': '67848203993222'
 };
-// Agrega o actualiza el botón "Comprar" dentro de un detalle de producto.
-function updateBuyButton(container, sku) {
+// Agrega o actualiza el botón "Agregar al carrito" de un producto: agrega la
+// variante al carrito de Shopify y abre el carrito. `before` es el selector del
+// elemento antes del cual se inserta; sin él, el botón va al final del contenedor.
+function updateBuyButton(container, sku, before) {
   if(!container) return;
   let link = container.querySelector('.buy-link');
   const variant = shopifyVariants[sku];
@@ -33,8 +35,9 @@ function updateBuyButton(container, sku) {
     link.className = 'button buy-link';
     link.target = '_blank';
     link.rel = 'noopener';
-    link.innerHTML = 'Comprar <span>↗</span>';
-    container.querySelector('.button.dark').before(link);
+    link.innerHTML = 'Agregar al carrito <span>↗</span>';
+    const anchor = before && container.querySelector(before);
+    if(anchor) anchor.before(link); else container.append(link);
   }
   link.href = 'https://' + shopifyStore + '/cart/' + variant + ':1';
 }

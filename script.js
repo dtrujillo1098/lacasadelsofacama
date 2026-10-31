@@ -106,7 +106,7 @@ function showProductPhoto(index) {
   detailImage.alt = selectedPhoto === 0 ? 'Sofá cama ' + selectedProduct.name + ', ' + fabric.name + ', color ' + fabric.color : photo.alt;
   document.querySelector('#photo-caption').textContent = (selectedPhoto + 1) + ' / 4 · ' + photo.label + (selectedPhoto === 0 ? ' · ' + fabric.color : ' · Acabado original: ' + selectedProduct.color);
   thumbs.querySelectorAll('button').forEach((button,i) => button.setAttribute('aria-pressed', String(i === selectedPhoto)));
-  updateBuyButton(detail.querySelector('.detail-copy'), 'sofacama-' + selectedProduct.id + '-' + fabric.id);
+  updateBuyButton(detail.querySelector('.detail-copy'), 'sofacama-' + selectedProduct.id + '-' + fabric.id, '.button.dark');
 }
 function updateFabricButtons(productIndex) {
   document.querySelectorAll('[data-fabric-product="' + productIndex + '"]').forEach(button => {
@@ -123,6 +123,7 @@ function selectFabric(productIndex, fabricIndex) {
   cardImage.alt = 'Sofá cama ' + product.name + ', ' + fabric.name + ', color ' + fabric.color;
   card.querySelector('.fabric-selected').textContent = fabric.name + ' · ' + fabric.color;
   card.querySelector('.product-meta span').textContent = fabric.color;
+  updateBuyButton(card, 'sofacama-' + product.id + '-' + fabric.id);
   updateFabricButtons(productIndex);
   if(selectedProductIndex === productIndex) {
     document.querySelector('#detail-color').textContent = 'Tela elegida: ' + fabric.name + ' · ' + fabric.color;
@@ -139,6 +140,7 @@ bindFabricButtons(document.querySelector('#products'));
 products.forEach((product,i) => {
   const card = document.querySelectorAll('#products .product-card')[i];
   card.dataset.name += ' ' + product.fabrics.map(f=>f.name + ' ' + f.color).join(' ');
+  updateBuyButton(card, 'sofacama-' + product.id + '-' + product.fabrics[0].id);
 });
 document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => {
   selectedProductIndex = Number(button.dataset.product);
@@ -213,10 +215,13 @@ if(lineDialog) {
     document.querySelector('#line-detail-description').textContent = item.description;
     document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
     const image = document.querySelector('#line-detail-image'); image.src = siteUrl(item.image); image.alt = item.name + ', ' + item.color;
-    updateBuyButton(lineDialog.querySelector('.detail-copy'), item.id);
+    updateBuyButton(lineDialog.querySelector('.detail-copy'), item.id, '.button.dark');
     openDialog(lineDialog); lineDialog.scrollTop = 0;
   }
-  document.querySelectorAll('[data-line-product]').forEach(button => button.addEventListener('click', () => openLineProduct(button.dataset.lineProduct)));
+  document.querySelectorAll('[data-line-product]').forEach(button => {
+    button.addEventListener('click', () => openLineProduct(button.dataset.lineProduct));
+    updateBuyButton(button.closest('.line-product'), button.dataset.lineProduct);
+  });
   document.querySelector('#line-detail-close').addEventListener('click', () => lineDialog.close());
   if(requestedProduct) openLineProduct(requestedProduct);
 }
