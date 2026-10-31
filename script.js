@@ -65,7 +65,7 @@ function renderGlobalSearch() {
     const copy = document.createElement('div');
     const label = document.createElement('small'); label.textContent = product.category;
     const name = document.createElement('strong'); name.textContent = product.name;
-    const note = document.createElement('span'); note.textContent = 'Modelo provisional · Ver detalles';
+    const note = document.createElement('span'); note.textContent = 'Ver detalles';
     copy.append(label,name,note); link.append(image,copy); globalSearchResults.appendChild(link);
   });
 }
