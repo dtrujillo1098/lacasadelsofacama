@@ -1,5 +1,5 @@
 const siteBase = document.body.dataset.siteBase || './';
-const siteUrl = value => siteBase + value.replace(/^\.\//, '');
+const siteUrl = value => value && value.startsWith('https://') ? value : siteBase + (value || '').replace(/^\.\//, '');
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const menu = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#main-nav');
@@ -45,10 +45,7 @@ const categoryPages = [
   {name:'Sillas auxiliares',file:'sillas-auxiliares.html'},
   {name:'Camas',file:'camas.html'}
 ];
-const allSearchProducts = [
-  ...products.map(product => ({id:product.id,name:product.name,type:'Sofacama',category:'Sofacamas',file:'sofacamas.html',image:product.photos[0].src,terms:[product.name,'sofacama sofá cama sofacamas',product.color,...product.fabrics.map(f=>f.name+' '+f.color)].join(' ')})),
-  ...newLineProducts.map(product => ({...product,category:product.lineName,file:product.line+'.html',terms:[product.name,product.type,product.color,product.lineName].join(' ')}))
-];
+const allSearchProducts = [];
 const searchDialog = document.querySelector('#search-dialog');
 const globalSearchInput = document.querySelector('#global-search-input');
 const globalSearchResults = document.querySelector('#global-search-results');
@@ -75,163 +72,199 @@ globalSearchInput?.addEventListener('input', renderGlobalSearch);
 document.querySelector('#global-search-form')?.addEventListener('submit', event => { event.preventDefault(); renderGlobalSearch(); });
 const requestedProduct = new URLSearchParams(window.location.search).get('producto');
 
-const sofaGrid = document.querySelector('#products');
-const detail = document.querySelector('#product-dialog');
-if(sofaGrid && detail) {
-  const search = document.querySelector('#search');
-  let category = 'all';
-  function filterProducts() {
-    let count = 0; const query = normalize(search.value.trim());
-    sofaGrid.querySelectorAll('.product-card').forEach(card => { card.hidden = !((category === 'all' || card.dataset.category === category) && normalize(card.dataset.name).includes(query)); if(!card.hidden) count++; });
-    document.querySelector('#empty-results').hidden = count > 0;
-    document.querySelector('#empty-results').textContent = 'No encontramos ese sofacama. Prueba otro nombre o selecciona “Ver todos”.';
-    document.querySelector('#result-count').textContent = count + ' sofacamas';
-  }
-  search.addEventListener('input',filterProducts);
-  document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click',()=>{category=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(other=>{const active=other===button;other.classList.toggle('active',active);other.setAttribute('aria-pressed',String(active));});filterProducts();}));
-let selectedProduct = null;
-let selectedProductIndex = -1;
-let selectedPhoto = 0;
-const fabricSelections = products.map(() => 0);
-const detailImage = document.querySelector('#detail-image');
-const thumbs = document.querySelector('#photo-thumbnails');
-const detailFabricOptions = document.querySelector('#detail-fabric-options');
-function chosenFabric(index) { return products[index].fabrics[fabricSelections[index]]; }
-function showProductPhoto(index) {
-  if (!selectedProduct) return;
-  selectedPhoto = (index + selectedProduct.photos.length) % selectedProduct.photos.length;
-  const fabric = chosenFabric(selectedProductIndex);
-  const photo = selectedProduct.photos[selectedPhoto];
-  detailImage.src = selectedPhoto === 0 ? fabric.image : photo.src;
-  detailImage.alt = selectedPhoto === 0 ? 'Sofá cama ' + selectedProduct.name + ', ' + fabric.name + ', color ' + fabric.color : photo.alt;
-  document.querySelector('#photo-caption').textContent = (selectedPhoto + 1) + ' / 4 · ' + photo.label + (selectedPhoto === 0 ? ' · ' + fabric.color : ' · Acabado original: ' + selectedProduct.color);
-  thumbs.querySelectorAll('button').forEach((button,i) => button.setAttribute('aria-pressed', String(i === selectedPhoto)));
-  updateBuyButton(detail.querySelector('.detail-copy'), 'sofacama-' + selectedProduct.id + '-' + fabric.id, '.button.dark');
+
+const liveGrid = document.querySelector('#products, .line-grid');
+const liveSofa = !!document.querySelector('#products');
+const livePage = document.body.dataset.page;
+const liveSelections = new Map();
+let liveSelectedId = null, livePhotoIndex = 0, liveCategory = 'all';
+const liveDialog = document.querySelector('#product-dialog, #line-dialog');
+const liveCardTemplate = liveGrid?.querySelector('article')?.cloneNode(true);
+function selectedLiveVariant(product) {
+  return product.variants.find(variant => variant.id === liveSelections.get(product.id)) || product.variants[0];
 }
-function updateFabricButtons(productIndex) {
-  document.querySelectorAll('[data-fabric-product="' + productIndex + '"]').forEach(button => {
-    button.setAttribute('aria-pressed', String(Number(button.dataset.fabricIndex) === fabricSelections[productIndex]));
-  });
+function setLiveImage(image, url, alt) {
+  if (!image) return;
+  image.hidden = !url;
+  if (url) image.src = url; else image.removeAttribute('src');
+  image.alt = alt || '';
 }
-function selectFabric(productIndex, fabricIndex) {
-  fabricSelections[productIndex] = fabricIndex;
-  const product = products[productIndex];
-  const fabric = chosenFabric(productIndex);
-  const card = document.querySelectorAll('#products .product-card')[productIndex];
-  const cardImage = card.querySelector('.product-image img');
-  cardImage.src = fabric.image;
-  cardImage.alt = 'Sofá cama ' + product.name + ', ' + fabric.name + ', color ' + fabric.color;
-  card.querySelector('.fabric-selected').textContent = fabric.name + ' · ' + fabric.color;
-  card.querySelector('.product-meta span').textContent = fabric.color;
-  updateBuyButton(card, 'sofacama-' + product.id + '-' + fabric.id);
-  updateFabricButtons(productIndex);
-  if(selectedProductIndex === productIndex) {
-    document.querySelector('#detail-color').textContent = 'Tela elegida: ' + fabric.name + ' · ' + fabric.color;
-    thumbs.querySelector('img').src = fabric.image;
-    showProductPhoto(0);
-  }
-}
-function bindFabricButtons(container) {
-  container.querySelectorAll('[data-fabric-product]').forEach(button => button.addEventListener('click', () => {
-    selectFabric(Number(button.dataset.fabricProduct), Number(button.dataset.fabricIndex));
-  }));
-}
-bindFabricButtons(document.querySelector('#products'));
-products.forEach((product,i) => {
-  const card = document.querySelectorAll('#products .product-card')[i];
-  card.dataset.name += ' ' + product.fabrics.map(f=>f.name + ' ' + f.color).join(' ');
-  updateBuyButton(card, 'sofacama-' + product.id + '-' + product.fabrics[0].id);
-});
-document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => {
-  selectedProductIndex = Number(button.dataset.product);
-  selectedProduct = products[selectedProductIndex];
-  const fabric = chosenFabric(selectedProductIndex);
-  document.querySelector('#detail-title').textContent = 'Sofá cama ' + selectedProduct.name;
-  document.querySelector('#detail-description').textContent = selectedProduct.description;
-  document.querySelector('#detail-color').textContent = 'Tela elegida: ' + fabric.name + ' · ' + fabric.color;
-  detailFabricOptions.replaceChildren();
+function liveVariantControls(product, host) {
+  host.replaceChildren();
   const label = document.createElement('p');
   label.className = 'fabric-label';
-  label.textContent = 'Elige tela y color';
-  const group = document.createElement('div');
-  group.className = 'fabric-choices';
-  group.setAttribute('role', 'group');
-  group.setAttribute('aria-label', 'Tela y color de ' + selectedProduct.name);
-  selectedProduct.fabrics.forEach((option,i) => {
-    const swatch = document.createElement('button');
-    swatch.type = 'button';
-    swatch.className = 'fabric-choice';
-    swatch.dataset.fabricProduct = selectedProductIndex;
-    swatch.dataset.fabricIndex = i;
-    swatch.style.setProperty('--swatch', option.hex);
-    swatch.setAttribute('aria-label', option.name + ', ' + option.color);
-    swatch.title = option.name + ' · ' + option.color;
-    swatch.appendChild(document.createElement('span'));
-    group.appendChild(swatch);
+  label.textContent = 'Elige una opción';
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', 'Opciones de ' + product.title);
+  select.dataset.liveVariant = product.id;
+  for (const variant of product.variants) {
+    const option = document.createElement('option');
+    option.value = variant.id;
+    option.textContent = variant.title + (variant.availableForSale ? '' : ' · Agotado');
+    option.selected = variant.id === selectedLiveVariant(product).id;
+    select.append(option);
+  }
+  host.append(label, select);
+}
+function filterLiveCatalog() {
+  if (!liveGrid) return;
+  const search = document.querySelector('#search, #line-search');
+  const query = normalize(search?.value.trim() || '');
+  let count = 0;
+  liveGrid.querySelectorAll('[data-live-product]').forEach(card => {
+    const product = shopifyLiveProducts.find(item => item.id === card.dataset.liveProduct);
+    card.hidden = !product || !(liveCategory === 'all' || product.tags.includes(liveCategory)) || !normalize([product.title, product.description, ...product.variants.map(variant => variant.title)].join(' ')).includes(query);
+    if (!card.hidden) count++;
   });
-  detailFabricOptions.append(label,group);
-  bindFabricButtons(detailFabricOptions);
-  updateFabricButtons(selectedProductIndex);
-  thumbs.replaceChildren();
-  selectedProduct.photos.forEach((photo,i) => {
-    const thumb = document.createElement('button');
-    thumb.type = 'button';
-    thumb.setAttribute('aria-label', 'Ver ' + photo.label.toLowerCase());
-    const image = document.createElement('img');
-    image.src = i === 0 ? fabric.image : photo.src;
-    image.alt = '';
-    image.width = 100;
-    image.height = 100;
-    thumb.appendChild(image);
-    thumb.addEventListener('click', () => showProductPhoto(i));
-    thumbs.appendChild(thumb);
+  const empty = document.querySelector('#empty-results, #line-empty');
+  if (empty) empty.hidden = count > 0;
+  const countLabel = document.querySelector('#result-count, #line-search-status');
+  if (countLabel) countLabel.textContent = count + (count === 1 ? ' modelo' : ' modelos');
+}
+function renderLiveCatalog() {
+  if (!liveGrid || !liveCardTemplate) return;
+  liveGrid.replaceChildren();
+  const list = shopifyLiveProducts.filter(product => product.line === livePage);
+  for (const product of list) {
+    const card = liveCardTemplate.cloneNode(true);
+    card.dataset.liveProduct = product.id;
+    card.querySelectorAll('.buy-link').forEach(link => link.remove());
+    card.querySelectorAll('[data-product], [data-line-product]').forEach(button => {
+      button.removeAttribute('data-product');
+      button.removeAttribute('data-line-product');
+      button.dataset.liveOpen = product.id;
+      button.setAttribute('aria-label', 'Ver ' + product.title);
+    });
+    card.querySelector('h3').textContent = product.title;
+    const description = card.querySelector('.line-description') || card.querySelector('.product-title + p');
+    if (description) description.textContent = product.description;
+    const variant = selectedLiveVariant(product);
+    setLiveImage(card.querySelector('img'), variant.image?.url || product.image, product.title + ' · ' + variant.title);
+    const choices = card.querySelector('.fabric-options');
+    if (choices) liveVariantControls(product, choices);
+    else if (product.variants.length > 1) {
+      const host = document.createElement('div');
+      liveVariantControls(product, host);
+      card.querySelector('.line-meta').before(host);
+    }
+    const meta = card.querySelector('.product-meta span, .line-meta span');
+    if (meta) meta.textContent = variant.title === 'Default Title' ? '' : variant.title;
+    const type = card.querySelector('.line-type');
+    if (type) type.textContent = product.productType;
+    const photoCount = card.querySelector('.product-meta span + span');
+    if (photoCount) photoCount.textContent = product.photos.length + ' fotos';
+    const imageAction = card.querySelector('.view-product');
+    if (imageAction) imageAction.textContent = 'Ver modelo ↗';
+    updateBuyButton(card, variant.key);
+    liveGrid.append(card);
+  }
+  const intro = document.querySelector('.page-intro-text');
+  if (intro && liveSofa) intro.textContent = 'Explora los sofacamas de nuestra colección y sus opciones disponibles.';
+  filterLiveCatalog();
+}
+function renderLiveDetail() {
+  const product = shopifyLiveProducts.find(item => item.id === liveSelectedId);
+  if (!product || product.line !== livePage) { liveDialog?.close(); liveSelectedId = null; return; }
+  const variant = selectedLiveVariant(product);
+  document.querySelector('#detail-title, #line-detail-title').textContent = product.title;
+  document.querySelector('#detail-description, #line-detail-description').textContent = product.description;
+  const color = document.querySelector('#detail-color, #line-detail-color');
+  if (color) color.textContent = variant.title === 'Default Title' ? '' : variant.title;
+  let controls = liveDialog.querySelector('#detail-fabric-options, .live-detail-options');
+  if (!controls) {
+    controls = document.createElement('div');
+    controls.className = 'live-detail-options';
+    color.after(controls);
+  }
+  liveVariantControls(product, controls);
+  const photos = variant.image ? [variant.image, ...product.photos.filter(photo => photo.url !== variant.image.url)] : [...product.photos];
+  if (livePhotoIndex >= photos.length) livePhotoIndex = 0;
+  const photo = photos[livePhotoIndex];
+  setLiveImage(liveDialog.querySelector('#detail-image, #line-detail-image'), photo?.url, photo?.altText || product.title);
+  const thumbs = liveDialog.querySelector('#photo-thumbnails');
+  if (thumbs) {
+    thumbs.replaceChildren();
+    photos.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.livePhoto = index;
+      button.setAttribute('aria-label', 'Ver foto ' + (index + 1));
+      button.setAttribute('aria-pressed', String(index === livePhotoIndex));
+      const image = document.createElement('img');
+      setLiveImage(image, item.url, '');
+      button.append(image);
+      thumbs.append(button);
+    });
+  }
+  const caption = document.querySelector('#photo-caption');
+  if (caption) caption.textContent = photos.length ? (livePhotoIndex + 1) + ' / ' + photos.length : 'Sin fotografías';
+  const note = document.querySelector('#fabric-view-note');
+  if (note) note.hidden = true;
+  const category = document.querySelector('#line-detail-category');
+  if (category) category.textContent = product.lineName + ' · ' + product.productType;
+  updateBuyButton(liveDialog.querySelector('.detail-copy'), variant.key, '.button.dark');
+}
+liveGrid?.replaceChildren(); // Do not present an old static catalog as live data.
+document.querySelector('#search, #line-search')?.addEventListener('input', filterLiveCatalog);
+document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
+  liveCategory = button.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(item => {
+    item.classList.toggle('active', item === button);
+    item.setAttribute('aria-pressed', String(item === button));
   });
-  showProductPhoto(0);
-  openDialog(detail);
-  detail.scrollTop = 0;
+  filterLiveCatalog();
 }));
-document.querySelector('#photo-prev').addEventListener('click', () => showProductPhoto(selectedPhoto - 1));
-document.querySelector('#photo-next').addEventListener('click', () => showProductPhoto(selectedPhoto + 1));
-detail.addEventListener('keydown', event => {
-  if(event.target.closest('.fabric-choices')) return;
-  if(event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    event.preventDefault();
-    showProductPhoto(selectedPhoto + (event.key === 'ArrowLeft' ? -1 : 1));
+document.addEventListener('click', event => {
+  const opener = event.target.closest('[data-live-open]');
+  if (opener) {
+    liveSelectedId = opener.dataset.liveOpen;
+    livePhotoIndex = 0;
+    renderLiveDetail();
+    openDialog(liveDialog);
+  }
+  const photo = event.target.closest('[data-live-photo]');
+  if (photo) { livePhotoIndex = Number(photo.dataset.livePhoto); renderLiveDetail(); }
+});
+document.addEventListener('change', event => {
+  if (!event.target.matches('[data-live-variant]')) return;
+  liveSelections.set(event.target.dataset.liveVariant, event.target.value);
+  livePhotoIndex = 0;
+  renderLiveCatalog();
+  if (liveDialog?.open) renderLiveDetail();
+});
+function moveLivePhoto(delta) {
+  const product = shopifyLiveProducts.find(item => item.id === liveSelectedId);
+  if (!product) return;
+  const variant = selectedLiveVariant(product);
+  const count = product.photos.length + (variant.image && !product.photos.some(photo => photo.url === variant.image.url) ? 1 : 0);
+  livePhotoIndex = count ? (livePhotoIndex + delta + count) % count : 0;
+  renderLiveDetail();
+}
+document.querySelector('#photo-prev')?.addEventListener('click', () => moveLivePhoto(-1));
+document.querySelector('#photo-next')?.addEventListener('click', () => moveLivePhoto(1));
+liveDialog?.addEventListener('keydown', event => {
+  if (event.target.matches('select, option')) return;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault(); moveLivePhoto(event.key === 'ArrowLeft' ? -1 : 1);
+  }
+});
+document.querySelector('#back-to-catalog, #line-detail-close')?.addEventListener('click', () => liveDialog.close());
+let liveOpenedRequested = false;
+window.addEventListener('shopify:updated', () => {
+  renderLiveCatalog();
+  if (liveDialog?.open) renderLiveDetail();
+  allSearchProducts.splice(0, allSearchProducts.length, ...shopifyLiveProducts.map(product => ({
+    id:product.localId, name:product.title, category:product.lineName, file:product.line + '.html',
+    image:product.image, terms:[product.title, product.description, product.productType, ...product.tags, ...product.variants.map(variant => variant.title)].join(' ')
+  })));
+  if (searchDialog?.open) renderGlobalSearch();
+  if (requestedProduct && !liveOpenedRequested && liveDialog) {
+    liveOpenedRequested = true;
+    const product = shopifyLiveProducts.find(item => item.localId === requestedProduct && item.line === livePage);
+    if (product) { liveSelectedId = product.id; renderLiveDetail(); openDialog(liveDialog); }
   }
 });
 
-  document.querySelector('#back-to-catalog').addEventListener('click',()=>detail.close());
-  if(requestedProduct) { const index = products.findIndex(product=>product.id===requestedProduct); if(index>=0) document.querySelector('[data-product="'+index+'"]').click(); }
-}
-
-
-const lineDialog = document.querySelector('#line-dialog');
-if(lineDialog) {
-  function openLineProduct(id) {
-    const item = newLineProducts.find(product => product.id === id);
-    if(!item || !document.querySelector('[data-line-product="'+id+'"]')) return;
-    document.querySelector('#line-detail-title').textContent = item.name;
-    document.querySelector('#line-detail-category').textContent = item.lineName + ' · ' + item.type;
-    document.querySelector('#line-detail-description').textContent = item.description;
-    document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
-    const image = document.querySelector('#line-detail-image'); image.src = siteUrl(item.image); image.alt = item.name + ', ' + item.color;
-    updateBuyButton(lineDialog.querySelector('.detail-copy'), item.id, '.button.dark');
-    openDialog(lineDialog); lineDialog.scrollTop = 0;
-  }
-  document.querySelectorAll('[data-line-product]').forEach(button => {
-    button.addEventListener('click', () => openLineProduct(button.dataset.lineProduct));
-    updateBuyButton(button.closest('.line-product'), button.dataset.lineProduct);
-  });
-  document.querySelector('#line-detail-close').addEventListener('click', () => lineDialog.close());
-  if(requestedProduct) openLineProduct(requestedProduct);
-}
-const lineSearch = document.querySelector('#line-search');
-if(lineSearch) lineSearch.addEventListener('input', () => {
-  const query = normalize(lineSearch.value.trim()); let count = 0;
-  document.querySelectorAll('.line-product').forEach(card => { card.hidden = !normalize(card.dataset.lineName).includes(query); if(!card.hidden) count++; });
-  document.querySelector('#line-search-status').textContent = count + (count === 1 ? ' modelo' : ' modelos');
-  document.querySelector('#line-empty').hidden = count > 0;
-});
 
 const slides = Array.from(document.querySelectorAll('.hero-slide'));
 if(slides.length) {
