@@ -118,3 +118,5 @@
 .hero .hero-copy .button.light:active{transform:translateY(0);box-shadow:0 3px 12px rgba(46,35,28,.12)}
 .hero .hero-copy .button.light:focus-visible{outline:2px solid #fff7ed;outline-offset:5px}
 @media(max-width:520px){.hero .hero-copy .button.light{min-width:205px;min-height:50px;padding:15px 25px;font-size:11px}}
+
+.detail-copy .buy-link{display:inline-flex;margin:0 .75rem .75rem 0}

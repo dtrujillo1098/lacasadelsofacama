@@ -106,6 +106,7 @@ function showProductPhoto(index) {
   detailImage.alt = selectedPhoto === 0 ? 'Sofá cama ' + selectedProduct.name + ', ' + fabric.name + ', color ' + fabric.color : photo.alt;
   document.querySelector('#photo-caption').textContent = (selectedPhoto + 1) + ' / 4 · ' + photo.label + (selectedPhoto === 0 ? ' · ' + fabric.color : ' · Acabado original: ' + selectedProduct.color);
   thumbs.querySelectorAll('button').forEach((button,i) => button.setAttribute('aria-pressed', String(i === selectedPhoto)));
+  updateBuyButton(detail.querySelector('.detail-copy'), 'sofacama-' + selectedProduct.id + '-' + fabric.id);
 }
 function updateFabricButtons(productIndex) {
   document.querySelectorAll('[data-fabric-product="' + productIndex + '"]').forEach(button => {
@@ -212,6 +213,7 @@ if(lineDialog) {
     document.querySelector('#line-detail-description').textContent = item.description;
     document.querySelector('#line-detail-color').textContent = 'Color de referencia: ' + item.color;
     const image = document.querySelector('#line-detail-image'); image.src = siteUrl(item.image); image.alt = item.name + ', ' + item.color;
+    updateBuyButton(lineDialog.querySelector('.detail-copy'), item.id);
     openDialog(lineDialog); lineDialog.scrollTop = 0;
   }
   document.querySelectorAll('[data-line-product]').forEach(button => button.addEventListener('click', () => openLineProduct(button.dataset.lineProduct)));
