@@ -1,8 +1,8 @@
 /* Rediseño de tienda: De día sofá, de noche cama. Se carga después del resto de estilos. */
 :root{
-  --dia:#f4f5f1;--blanco:#fff;--noche:#16323b;--noche-2:#0f252c;--tinta:#16252b;
-  --gris:#53646a;--linea:#d5dad6;--mostaza:#e3aa35;
-  --display:'Bricolage Grotesque',system-ui,sans-serif;--texto:'Instrument Sans',system-ui,sans-serif;
+  --dia:#fdf7f1;--blanco:#fffdfa;--noche:#5b5b2c;--noche-2:#3a2418;--tinta:#3a2418;
+  --gris:#76614f;--linea:#e6dacd;--mostaza:#c79a45;
+  --display:'Playfair Display',Georgia,serif;--texto:'DM Sans',system-ui,sans-serif;
   --ink:var(--tinta);--paper:var(--dia);--olive:var(--noche);--muted:var(--gris);--line:var(--linea);
   --ancho:1360px;--margen:clamp(16px,3.4vw,48px);
 }
@@ -21,12 +21,7 @@ h1 em,h2 em{font-style:normal}
 .header,body.site-home .header,body.site-home .header.scrolled{position:sticky;top:0;height:76px;display:flex;align-items:center;gap:32px;padding:0 var(--margen);background:var(--blanco)!important;border-bottom:1px solid var(--linea);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--tinta)}
 .header .brand-logo,body.site-home .header .brand-logo{position:static;transform:none;margin:0;flex:none;color:var(--tinta)}
 .header .brand-logo img,body.site-home .header .brand-logo img{filter:none!important}
-.brand-logo.logo7 img.logo7-mark{height:46px;width:auto}
-.logo7-sep{display:none}
-.logo7-text,.logo7-t1,.logo7-t2,.logo7-t3,body.site-home .header .logo7-text span{color:var(--tinta)!important;font-family:var(--display)}
-.logo7-t1{font-size:11px;letter-spacing:.02em;font-weight:500;text-transform:none}
-.logo7-t2{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1}
-.logo7-t3{display:none}
+.brand-logo.logo7 img.logo7-mark{height:50px;width:auto}
 footer .logo7-t1,footer .logo7-t2,footer .logo7-text{color:#fff!important}
 footer .brand-logo img{filter:brightness(0) invert(1)!important}
 @media(min-width:961px){
@@ -43,8 +38,7 @@ footer .brand-logo img{filter:brightness(0) invert(1)!important}
 @media(max-width:960px){
   .header,body.site-home .header,body.site-home .header.scrolled{height:64px;gap:8px;padding:0 8px}
   .brand-logo.logo7 img.logo7-mark{height:38px}
-  .logo7-t2{font-size:18px}
-  .header-actions .bag{font-size:0;gap:3px}
+    .header-actions .bag{font-size:0;gap:3px}
   .header-actions .bag span{font-size:14px}
   #main-nav a{text-transform:none;letter-spacing:0;color:var(--tinta)!important}
 }
@@ -158,7 +152,6 @@ html{scroll-padding-top:90px}
   .header nav#main-nav a,body.site-home .header nav#main-nav a{color:var(--tinta)!important;font:500 15px/1.2 var(--texto)!important;letter-spacing:0!important;text-transform:none!important}
 }
 .featured-card h3,.product-card h3,.product-card .product-title h3{font-family:var(--display)!important;font-weight:700!important;font-size:20px;letter-spacing:-.01em;color:var(--tinta)}
-.logo7-t2{font-family:var(--display)!important}
 .header-actions .icon svg{width:22px;height:22px}
 .header-actions .bag span{min-width:22px;height:22px;display:inline-grid;place-items:center;border-radius:50%;background:var(--noche);color:#fff;font-size:13px;border:0}
 @media(max-width:960px){
@@ -200,3 +193,74 @@ h2 em,.blog-section h2 em,.home-about h2 em,.home-about h2{font-style:normal;fon
 .blog-section .eyebrow{display:none}
 @media(min-width:761px){.blog-all-mobile,#blog .blog-all-mobile,#blog .journal-card:first-child .blog-all-mobile{display:none!important}}
 .page-intro{border-bottom:0!important}
+
+
+/* Landing: marca hija de Shalom */
+h1,h2,h3,.detail-copy h2,#detail-title{font-weight:500;letter-spacing:-.005em}
+.portada h1{font-size:clamp(44px,5.8vw,90px);line-height:1.02;letter-spacing:-.015em;font-weight:500}
+.page-intro h1{font-weight:500;letter-spacing:-.01em}
+.featured-card h3,.product-card h3,.product-card .product-title h3{font-weight:600!important;letter-spacing:0}
+.utility-bar{background:var(--noche)}
+.utility-message{letter-spacing:.02em}
+/* Toldo: la franja y los arcos del logo de la marca */
+.toldo{height:22px;background:radial-gradient(circle at 50% -60%,transparent 66%,var(--linea) 66.5%,var(--linea) 69%,transparent 69.5%) 0 0/120px 44px repeat-x,var(--dia)}
+.boton{background:var(--noche);color:#fff}
+.boton:hover{background:#474722;color:#fff}
+.boton-claro{background:none;color:var(--tinta);box-shadow:inset 0 0 0 1.5px var(--tinta)}
+.boton-claro:hover{background:var(--tinta);color:#fff}
+.vista button[aria-pressed=true]{background:var(--noche);color:#fff}
+.vista{background:#efe6da}
+.comparador .tirador{background:var(--noche)}
+.respaldo{display:flex;align-items:center;gap:12px;margin:26px 0 0!important;font-size:15px!important;color:var(--tinta)!important}
+.respaldo img{height:42px;width:auto;flex:none}
+.hechos{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--linea);border-block:1px solid var(--linea)}
+.hechos div{background:var(--blanco);padding:clamp(18px,2.4vw,30px) clamp(16px,3vw,44px)}
+.hechos strong{display:block;font:500 clamp(22px,2.4vw,32px)/1.15 var(--display);color:var(--tinta)}
+.hechos span{font-size:15px;color:var(--gris)}
+@media(max-width:700px){.hechos{grid-template-columns:repeat(2,1fr)}}
+.collection.section,#modelos{padding-top:clamp(44px,6vw,80px);scroll-margin-top:80px}
+.encabezado{margin:0 0 22px}
+.encabezado h2,.guide h2,.familia h2,.visita h2,.guias h2{font-size:clamp(32px,3.6vw,52px);line-height:1.08;margin:0 0 10px}
+.encabezado p{margin:0;color:var(--gris);font-size:17px}
+#guia{scroll-margin-top:80px}
+.guide-grid article{border-top-color:var(--mostaza)}
+.familia{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:center;gap:clamp(28px,5vw,88px);padding:clamp(52px,7vw,104px) max(var(--margen),calc((100% - var(--ancho))/2));background:var(--dia);scroll-margin-top:80px;border-top:1px solid var(--linea)}
+.familia-marca img{display:block;width:100%;max-width:440px;height:auto;margin:auto}
+.familia-texto p{font-size:18px;color:var(--gris);max-width:36em;margin:0 0 24px}
+.visita{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);align-items:stretch;background:var(--noche-2);color:#fff;scroll-margin-top:80px}
+.visita-foto{min-height:360px}
+.visita-foto img{display:block;width:100%;height:100%;max-height:640px;object-fit:cover}
+.visita-texto{padding:clamp(36px,5vw,80px) var(--margen);align-self:center}
+.visita h2{color:#fff}
+.visita p{color:#ead9c8;font-size:17px;margin:0 0 18px;max-width:32em}
+.visita address{font-style:normal;font-size:19px;line-height:1.5;margin:0 0 14px;color:#fff}
+.visita address a{color:#fff}
+.visita .nota{font-size:15px}
+.visita .boton{background:var(--mostaza);color:var(--noche-2)}
+.visita .boton:hover{background:#d8ad58;color:var(--noche-2)}
+.visita .boton-claro{background:none;color:#fff;box-shadow:inset 0 0 0 1.5px #fff}
+.visita .boton-claro:hover{background:#fff;color:var(--noche-2)}
+@media(max-width:860px){.familia,.visita{grid-template-columns:1fr}.visita-foto{min-height:0}.visita-foto img{aspect-ratio:4/3;max-height:none}}
+.guias{max-width:var(--ancho);margin:0 auto;padding:clamp(44px,6vw,72px) var(--margen)}
+.guias h2{font-size:clamp(26px,2.6vw,36px);margin-bottom:14px}
+.guias ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--linea)}
+.guias li{border-bottom:1px solid var(--linea)}
+.guias a{display:block;padding:16px 0;color:var(--tinta);font-size:18px;text-decoration:none}
+.guias a:hover{text-decoration:underline;text-underline-offset:4px}
+footer{background:var(--noche-2)}
+.marca-madre{display:inline-flex;align-items:center;gap:16px;margin:8px 0 22px;color:#fff;text-decoration:none}
+.marca-madre span{font-size:14px;color:#ead9c8}
+.marca-madre img{height:46px;width:auto;filter:brightness(0) invert(1)}
+#product-dialog a.buy-link{background:var(--noche)!important;color:#fff!important}
+#product-dialog a.buy-link:hover{background:#474722!important}
+.featured-section{display:none!important}
+.toldo{height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='26'%3E%3Cpath d='M12 0C12 16 28 22 48 22H152C172 22 188 16 188 0' fill='none' stroke='%23d9c8b4' stroke-width='1.4'/%3E%3C/svg%3E") 0 0/200px 26px repeat-x}
+@media(min-width:961px){.header,body.site-home .header{height:88px}}
+html{scroll-padding-top:104px}
+.guide.section,.familia,.hechos{padding-inline:calc(max(0px,(100% - var(--ancho))/2) + var(--margen))!important}
+.hechos{background:var(--blanco);gap:0}
+.hechos div{padding-inline:clamp(14px,2vw,28px);border-left:1px solid var(--linea)}
+.hechos div:first-child{border-left:0;padding-left:0}
+.guide .section-heading,.guide-grid{max-width:none}
+.marca-madre img{height:50px}
+@media(max-width:700px){.hechos div:nth-child(odd){border-left:0;padding-left:0}.hechos div{padding-block:14px}}

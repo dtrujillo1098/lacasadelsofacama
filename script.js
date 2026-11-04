@@ -397,7 +397,7 @@ if(slides.length) {
   document.addEventListener('visibilitychange',startRotation); startRotation();
 }
 if(document.body.dataset.page === 'inicio') {
-  const legacyPages = {coleccion:'sofacamas.html',nosotros:'nosotros.html',guia:'sofacamas.html#guia',inspiracion:'blog/index.html',blog:'blog/index.html'};
+  const legacyPages = {coleccion:'index.html#modelos',nosotros:'nosotros.html',inspiracion:'blog/index.html',blog:'blog/index.html'};
   const destination = legacyPages[window.location.hash.slice(1)];
   if(destination) window.location.replace(siteUrl(destination));
 }
