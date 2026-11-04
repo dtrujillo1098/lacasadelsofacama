@@ -433,7 +433,7 @@ const featuredGrid = document.querySelector('#featured-grid');
 if (featuredGrid) {
   const money = new Intl.NumberFormat('es-CO', {style:'currency', currency:'COP', maximumFractionDigits:0});
   window.addEventListener('shopify:updated', () => {
-    const items = shopifyLiveProducts.filter(product => product.line === 'sofacamas').slice(0, 4);
+    const items = shopifyLiveProducts.filter(product => product.line === 'sofacamas').slice(0, 8);
     featuredGrid.replaceChildren();
     for (const product of items) {
       const variant = product.variants[0];
