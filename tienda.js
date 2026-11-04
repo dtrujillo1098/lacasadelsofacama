@@ -15,6 +15,7 @@
     marco.append(img);
   }
   function decorar(){
+    if (typeof shopifyLiveProducts === 'undefined') return;
     document.querySelectorAll('[data-live-product]').forEach(card => {
       const product = shopifyLiveProducts.find(p => p.id === card.dataset.liveProduct);
       if (product) agregar(card.querySelector('.product-image, .line-image, button'), product, selectedLiveVariant(product));

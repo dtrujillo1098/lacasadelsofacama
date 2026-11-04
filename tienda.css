@@ -199,3 +199,4 @@ h2 em,.blog-section h2 em,.home-about h2 em,.home-about h2{font-style:normal;fon
 .blog-section h3,.blog-section h3 a{font-family:var(--display)!important;font-weight:700;color:var(--tinta);letter-spacing:-.01em}
 .blog-section .eyebrow{display:none}
 @media(min-width:761px){.blog-all-mobile,#blog .blog-all-mobile,#blog .journal-card:first-child .blog-all-mobile{display:none!important}}
+.page-intro{border-bottom:0!important}
