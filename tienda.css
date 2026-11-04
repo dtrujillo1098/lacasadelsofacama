@@ -1,7 +1,7 @@
 /* Rediseño de tienda: De día sofá, de noche cama. Se carga después del resto de estilos. */
 :root{
-  --dia:#fdf7f1;--blanco:#fffdfa;--noche:#5b5b2c;--noche-2:#3a2418;--tinta:#3a2418;
-  --gris:#76614f;--linea:#e6dacd;--mostaza:#c79a45;
+  --dia:#eef2f6;--blanco:#ffffff;--noche:#1b2a4a;--noche-2:#141f38;--tinta:#18233a;--hover:#111b31;--sobre-oscuro:#d3dceb;
+  --gris:#55617a;--linea:#d3dbe5;--mostaza:#f2b33d;--mostaza-h:#f7c561;
   --display:'Playfair Display',Georgia,serif;--texto:'DM Sans',system-ui,sans-serif;
   --ink:var(--tinta);--paper:var(--dia);--olive:var(--noche);--muted:var(--gris);--line:var(--linea);
   --ancho:1360px;--margen:clamp(16px,3.4vw,48px);
@@ -205,11 +205,11 @@ h1,h2,h3,.detail-copy h2,#detail-title{font-weight:500;letter-spacing:-.005em}
 /* Toldo: la franja y los arcos del logo de la marca */
 .toldo{height:22px;background:radial-gradient(circle at 50% -60%,transparent 66%,var(--linea) 66.5%,var(--linea) 69%,transparent 69.5%) 0 0/120px 44px repeat-x,var(--dia)}
 .boton{background:var(--noche);color:#fff}
-.boton:hover{background:#474722;color:#fff}
+.boton:hover{background:var(--hover);color:#fff}
 .boton-claro{background:none;color:var(--tinta);box-shadow:inset 0 0 0 1.5px var(--tinta)}
 .boton-claro:hover{background:var(--tinta);color:#fff}
 .vista button[aria-pressed=true]{background:var(--noche);color:#fff}
-.vista{background:#efe6da}
+.vista{background:#dfe6ee}
 .comparador .tirador{background:var(--noche)}
 .respaldo{display:flex;align-items:center;gap:12px;margin:26px 0 0!important;font-size:15px!important;color:var(--tinta)!important}
 .respaldo img{height:42px;width:auto;flex:none}
@@ -232,12 +232,12 @@ h1,h2,h3,.detail-copy h2,#detail-title{font-weight:500;letter-spacing:-.005em}
 .visita-foto img{display:block;width:100%;height:100%;max-height:640px;object-fit:cover}
 .visita-texto{padding:clamp(36px,5vw,80px) var(--margen);align-self:center}
 .visita h2{color:#fff}
-.visita p{color:#ead9c8;font-size:17px;margin:0 0 18px;max-width:32em}
+.visita p{color:var(--sobre-oscuro);font-size:17px;margin:0 0 18px;max-width:32em}
 .visita address{font-style:normal;font-size:19px;line-height:1.5;margin:0 0 14px;color:#fff}
 .visita address a{color:#fff}
 .visita .nota{font-size:15px}
 .visita .boton{background:var(--mostaza);color:var(--noche-2)}
-.visita .boton:hover{background:#d8ad58;color:var(--noche-2)}
+.visita .boton:hover{background:var(--mostaza-h);color:var(--noche-2)}
 .visita .boton-claro{background:none;color:#fff;box-shadow:inset 0 0 0 1.5px #fff}
 .visita .boton-claro:hover{background:#fff;color:var(--noche-2)}
 @media(max-width:860px){.familia,.visita{grid-template-columns:1fr}.visita-foto{min-height:0}.visita-foto img{aspect-ratio:4/3;max-height:none}}
@@ -249,12 +249,12 @@ h1,h2,h3,.detail-copy h2,#detail-title{font-weight:500;letter-spacing:-.005em}
 .guias a:hover{text-decoration:underline;text-underline-offset:4px}
 footer{background:var(--noche-2)}
 .marca-madre{display:inline-flex;align-items:center;gap:16px;margin:8px 0 22px;color:#fff;text-decoration:none}
-.marca-madre span{font-size:14px;color:#ead9c8}
+.marca-madre span{font-size:14px;color:var(--sobre-oscuro)}
 .marca-madre img{height:46px;width:auto;filter:brightness(0) invert(1)}
 #product-dialog a.buy-link{background:var(--noche)!important;color:#fff!important}
-#product-dialog a.buy-link:hover{background:#474722!important}
+#product-dialog a.buy-link:hover{background:var(--hover)!important}
 .featured-section{display:none!important}
-.toldo{height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='26'%3E%3Cpath d='M12 0C12 16 28 22 48 22H152C172 22 188 16 188 0' fill='none' stroke='%23d9c8b4' stroke-width='1.4'/%3E%3C/svg%3E") 0 0/200px 26px repeat-x}
+.toldo{height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='26'%3E%3Cpath d='M12 0C12 16 28 22 48 22H152C172 22 188 16 188 0' fill='none' stroke='%23b9c6d6' stroke-width='1.4'/%3E%3C/svg%3E") 0 0/200px 26px repeat-x}
 @media(min-width:961px){.header,body.site-home .header{height:88px}}
 html{scroll-padding-top:104px}
 .guide.section,.familia,.hechos{padding-inline:calc(max(0px,(100% - var(--ancho))/2) + var(--margen))!important}
@@ -264,3 +264,15 @@ html{scroll-padding-top:104px}
 .guide .section-heading,.guide-grid{max-width:none}
 .marca-madre img{height:50px}
 @media(max-width:700px){.hechos div:nth-child(odd){border-left:0;padding-left:0}.hechos div{padding-block:14px}}
+
+/* Paleta Noche y sol */
+.logo7-t1,.logo7-t2,.logo7-t3{color:var(--tinta)}
+.logo7-sep{background:var(--linea)}
+footer .logo7-t1,footer .logo7-t2,footer .logo7-t3{color:#fff}
+#product-dialog a.buy-link{background:var(--mostaza)!important;color:var(--noche-2)!important}
+#product-dialog a.buy-link:hover{background:var(--mostaza-h)!important}
+.boton:hover{background:var(--hover)}
+.portada-acciones .boton:not(.boton-claro){background:var(--noche)}
+.visita .portada-acciones .boton:not(.boton-claro){background:var(--mostaza);color:var(--noche-2)}
+.guide-grid article{border-top-color:var(--noche)}
+#product-dialog .fabric-choices{align-items:center}#product-dialog .fabric-choice{flex:0 0 34px;line-height:0}
