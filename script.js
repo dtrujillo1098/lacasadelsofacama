@@ -185,6 +185,8 @@ function liveVariantColor(product, variant) {
 }
 function liveVariantControls(product, host) {
   host.replaceChildren();
+  // Un modelo con una sola variante sin nombre ("Default Title" en Shopify) no muestra muestras.
+  if (product.variants.length === 1 && product.variants[0].title === 'Default Title') return;
   const label = document.createElement('p');
   label.className = 'fabric-label';
   label.textContent = 'Elige tela y color';
@@ -246,7 +248,7 @@ function renderLiveCatalog() {
     description?.remove();
     const variant = selectedLiveVariant(product);
     const photos = liveVariantPhotos(product, variant);
-    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, 900), product.title + ' · ' + liveVariantLabel(product, variant));
+    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, 900), product.title + (variant.title === 'Default Title' ? '' : ' · ' + liveVariantLabel(product, variant)));
     const choices = card.querySelector('.fabric-options');
     if (choices) liveVariantControls(product, choices);
     else if (product.variants.length > 1) {
@@ -260,7 +262,12 @@ function renderLiveCatalog() {
     const type = card.querySelector('.line-type');
     if (type) type.textContent = product.productType;
     card.querySelector('.product-meta')?.remove();
-    card.querySelector('.product-link')?.remove(); // se abre el producto desde la imagen
+    // Botón visible de compra: abre la ficha, donde se elige la tela y se paga.
+    const open = card.querySelector('.product-link');
+    if (open) {
+      open.textContent = 'Ver y comprar';
+      open.setAttribute('aria-label', 'Ver y comprar ' + product.title);
+    }
     card.querySelector('.view-product')?.remove(); // al pasar el mouse solo hace zoom la imagen
     updateBuyButton(card, variant.key);
     card.querySelectorAll('.buy-link').forEach(link => link.remove()); // el botón de compra solo se muestra dentro del producto
@@ -311,6 +318,11 @@ function renderLiveDetail() {
   const category = document.querySelector('#line-detail-category');
   if (category) category.textContent = product.lineName + ' · ' + product.productType;
   updateBuyButton(liveDialog.querySelector('.detail-copy'), variant.key, '.button.dark');
+  const ask = liveDialog.querySelector('#detail-whatsapp');
+  if (ask) {
+    const choice = variant.title === 'Default Title' ? '' : ' en ' + liveVariantLabel(product, variant);
+    ask.href = 'https://wa.me/573208442629?text=' + encodeURIComponent('Hola, quiero información sobre el ' + product.title + choice + '.');
+  }
 }
 liveGrid?.replaceChildren(); // Do not present an old static catalog as live data.
 document.querySelector('#search, #line-search')?.addEventListener('input', filterLiveCatalog);

@@ -38,6 +38,23 @@
     document.querySelectorAll('.vista button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.vista === 'cama') === cama)));
   }));
 
+  // Barra fija de compra (solo se ve en móvil): aparece cuando no están en pantalla
+  // los botones de la portada, el catálogo ni el bloque final, que ya llevan a comprar.
+  const barra = document.querySelector('#barra-compra');
+  if (barra && 'IntersectionObserver' in window) {
+    const enPantalla = new Set();
+    const observador = new IntersectionObserver(entradas => {
+      entradas.forEach(e => e.isIntersecting ? enPantalla.add(e.target) : enPantalla.delete(e.target));
+      const mostrar = enPantalla.size === 0;
+      barra.hidden = !mostrar;
+      document.body.classList.toggle('con-barra', mostrar);
+    });
+    ['.portada-acciones', '#modelos', '#comprar'].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) observador.observe(el);
+    });
+  }
+
   const comparador = document.querySelector('.comparador');
   if (comparador) {
     const rango = comparador.querySelector('input');
