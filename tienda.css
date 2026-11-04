@@ -38,8 +38,8 @@ footer .brand-logo img{filter:brightness(0) invert(1)!important}
 @media(max-width:960px){
   .header,body.site-home .header,body.site-home .header.scrolled{height:64px;gap:8px;padding:0 8px}
   .brand-logo.logo7 img.logo7-mark{height:38px}
-    .header-actions .bag{font-size:0;gap:3px}
-  .header-actions .bag span{font-size:14px}
+  /* Sin bolsa propia: la lupa ocupa la tercera columna del encabezado en móvil. */
+  .header-actions #search-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:44px;padding:0}
   #main-nav a{text-transform:none;letter-spacing:0;color:var(--tinta)!important}
 }
 
@@ -153,10 +153,7 @@ html{scroll-padding-top:90px}
 }
 .featured-card h3,.product-card h3,.product-card .product-title h3{font-family:var(--display)!important;font-weight:700!important;font-size:20px;letter-spacing:-.01em;color:var(--tinta)}
 .header-actions .icon svg{width:22px;height:22px}
-.header-actions .bag span{min-width:22px;height:22px;display:inline-grid;place-items:center;border-radius:50%;background:var(--noche);color:#fff;font-size:13px;border:0}
 @media(max-width:960px){
-  .header-actions .bag{font-size:0!important;position:static}
-  .header-actions .bag span{position:static;font-size:13px!important}
   .header-actions{flex:none}
   .brand-logo.logo7{min-width:0}
   .portada h1{margin-top:4px}
@@ -181,7 +178,6 @@ html{scroll-padding-top:90px}
 body.site-home .portada{padding-top:clamp(24px,4vw,56px)}
 #product-dialog .fabric-choice,.fabric-choice,.product-card .fabric-choice{min-height:0!important;max-height:none;box-sizing:border-box}
 #product-dialog .fabric-choice{width:34px!important;height:34px!important}
-.header-actions .bag span,body.site-home .header-actions .bag span{color:#fff!important;background:var(--noche)!important}
 @media(max-width:960px){
   .header,body.site-home .header,body.site-home .header.scrolled{padding:0 12px 0 8px}
   .catalog-toolbar{flex-direction:row!important;align-items:center}

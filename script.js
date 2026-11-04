@@ -45,13 +45,6 @@ document.querySelectorAll('dialog').forEach(dialog => {
     if(event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
   });
 });
-const cart = document.querySelector('#cart-dialog');
-document.querySelectorAll('#cart-toggle, #utility-cart').forEach(button => button.addEventListener('click', () => { closeMenu(); openDialog(cart); }));
-document.querySelector('#cart-explore')?.addEventListener('click', () => {
-  cart.close();
-  const overview = document.querySelector('#categorias');
-  if(overview) overview.scrollIntoView(); else window.location.assign(siteUrl('index.html#categorias'));
-});
 
 const categoryPages = [
   {name:'Sofacamas',file:'sofacamas.html'}
@@ -171,17 +164,24 @@ function setLiveImage(image, url, alt) {
   if (url) image.src = url; else image.removeAttribute('src');
   image.alt = alt || '';
 }
+// Color de la muestra según el nombre de la variante en Shopify. Los nombres más
+// largos van primero para que "Gris pizarra" gane sobre "Gris".
+const liveFabricColors = [
+  ['Azul medianoche', '#344d64'], ['Azul petróleo', '#2e6670'], ['Verde botella', '#355749'],
+  ['Gris pizarra', '#606263'], ['Blanco hueso', '#e5e0d4'], ['Verde bosque', '#3f5c46'],
+  ['Azul oscuro', '#293f66'], ['Gris carbón', '#555858'], ['Azul cielo', '#7897ac'],
+  ['Gris perla', '#afb0ac'], ['Rosa viejo', '#ba8d88'], ['Terracota', '#b96c4e'],
+  ['Mostaza', '#bf923d'], ['Marfil', '#ddd3bd'], ['Blanco', '#eeeae2'], ['Beige', '#c5bca8'],
+  ['Arena', '#cab99c'], ['Crudo', '#d7cdb8'], ['Café', '#795b45'], ['Gris', '#606263']
+].sort((a, b) => b[0].length - a[0].length);
 function liveVariantColor(product, variant) {
   if (product.id === 'gid://shopify/Product/15461604130950' && variant.id === 'gid://shopify/ProductVariant/67848189870214') return '#f1eee6';
   if (product.id === 'gid://shopify/Product/15461604098182') { const colors = {"gid://shopify/ProductVariant/67848189739142": "#c5bca8", "gid://shopify/ProductVariant/67848189771910": "#eeeae2", "gid://shopify/ProductVariant/67848189804678": "#7897ac", "gid://shopify/ProductVariant/67848189837446": "#293f66"}; if (colors[variant.id]) return colors[variant.id]; }
   if (product.id === 'gid://shopify/Product/15461603836038' && variant.id === 'gid://shopify/ProductVariant/67848185053318') return '#ac9b7d';
   if (product.id === 'gid://shopify/Product/15461603836038' && variant.id === 'gid://shopify/ProductVariant/67848185020550') return '#4c4d50';
   const title = normalize(variant.title);
-  const known = products.flatMap(item => item.id === 'polar' ? [{"color": "Terracota", "hex": "#b16b4a"}, {"color": "Arena", "hex": "#cab99c"}, {"color": "Azul petróleo", "hex": "#2e6670"}, {"color": "Mostaza", "hex": "#bf923d"}] : item.fabrics).sort((a,b) => b.color.length - a.color.length);
-  const color = known.find(fabric => title.includes(normalize(fabric.color)));
-  if (color) return color.hex;
-  const original = products.find(item => item.id === product.localId);
-  return original?.fabrics.find(fabric => variant.sku === 'sofacama-' + product.localId + '-' + fabric.id)?.hex || '#cab99c';
+  const color = liveFabricColors.find(([name]) => title.includes(normalize(name)));
+  return color ? color[1] : '#cab99c';
 }
 function liveVariantControls(product, host) {
   host.replaceChildren();
