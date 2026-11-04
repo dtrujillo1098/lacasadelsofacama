@@ -54,7 +54,9 @@ function updateBuyButton(container, sku, before) {
     link.className = 'button buy-link';
     link.target = '_blank';
     link.rel = 'noopener';
-    link.textContent = 'Agregar al carrito';
+    // El enlace /cart/ID:1 de Shopify lleva directo al pago, no a una bolsa.
+    link.textContent = 'Comprar';
+    link.setAttribute('aria-label', 'Comprar: abre el pago de Shopify en una pestaña nueva');
   }
   const price = container.querySelector('.product-price, .line-meta strong');
   if (price) {

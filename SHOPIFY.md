@@ -15,8 +15,12 @@ solo muestra sofacamas. Las etiquetas compacto, amplio y color
 alimentan los filtros de sofacamas. Productos de otras categorías no se muestran.
 
 Los archivos catalog.js, new-lines.js y precios.json quedan como material
-anterior; el catálogo visible y la búsqueda ya no utilizan sus datos.
-El botón de cada variante disponible abre el carrito de Shopify.
+anterior y ninguna página los carga. Los colores de las muestras de tela salen
+de la tabla liveFabricColors de script.js, según el nombre de la variante.
+El botón "Comprar" de cada variante disponible abre el pago de Shopify
+(/cart/ID:1) en una pestaña nueva. El sitio no tiene bolsa propia.
+Mientras la tienda online de Shopify tenga contraseña, ese enlace termina en
+/password y no se puede pagar.
 
 Si falla una consulta se conserva la última consulta en memoria, se muestra un
 aviso y se desactivan los enlaces de compra hasta la siguiente consulta correcta.

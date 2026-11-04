@@ -45,13 +45,6 @@ document.querySelectorAll('dialog').forEach(dialog => {
     if(event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
   });
 });
-const cart = document.querySelector('#cart-dialog');
-document.querySelectorAll('#cart-toggle, #utility-cart').forEach(button => button.addEventListener('click', () => { closeMenu(); openDialog(cart); }));
-document.querySelector('#cart-explore')?.addEventListener('click', () => {
-  cart.close();
-  const overview = document.querySelector('#categorias');
-  if(overview) overview.scrollIntoView(); else window.location.assign(siteUrl('index.html#categorias'));
-});
 
 const categoryPages = [
   {name:'Sofacamas',file:'sofacamas.html'}
@@ -171,20 +164,29 @@ function setLiveImage(image, url, alt) {
   if (url) image.src = url; else image.removeAttribute('src');
   image.alt = alt || '';
 }
+// Color de la muestra según el nombre de la variante en Shopify. Los nombres más
+// largos van primero para que "Gris pizarra" gane sobre "Gris".
+const liveFabricColors = [
+  ['Azul medianoche', '#344d64'], ['Azul petróleo', '#2e6670'], ['Verde botella', '#355749'],
+  ['Gris pizarra', '#606263'], ['Blanco hueso', '#e5e0d4'], ['Verde bosque', '#3f5c46'],
+  ['Azul oscuro', '#293f66'], ['Gris carbón', '#555858'], ['Azul cielo', '#7897ac'],
+  ['Gris perla', '#afb0ac'], ['Rosa viejo', '#ba8d88'], ['Terracota', '#b96c4e'],
+  ['Mostaza', '#bf923d'], ['Marfil', '#ddd3bd'], ['Blanco', '#eeeae2'], ['Beige', '#c5bca8'],
+  ['Arena', '#cab99c'], ['Crudo', '#d7cdb8'], ['Café', '#795b45'], ['Gris', '#606263']
+].sort((a, b) => b[0].length - a[0].length);
 function liveVariantColor(product, variant) {
   if (product.id === 'gid://shopify/Product/15461604130950' && variant.id === 'gid://shopify/ProductVariant/67848189870214') return '#f1eee6';
   if (product.id === 'gid://shopify/Product/15461604098182') { const colors = {"gid://shopify/ProductVariant/67848189739142": "#c5bca8", "gid://shopify/ProductVariant/67848189771910": "#eeeae2", "gid://shopify/ProductVariant/67848189804678": "#7897ac", "gid://shopify/ProductVariant/67848189837446": "#293f66"}; if (colors[variant.id]) return colors[variant.id]; }
   if (product.id === 'gid://shopify/Product/15461603836038' && variant.id === 'gid://shopify/ProductVariant/67848185053318') return '#ac9b7d';
   if (product.id === 'gid://shopify/Product/15461603836038' && variant.id === 'gid://shopify/ProductVariant/67848185020550') return '#4c4d50';
   const title = normalize(variant.title);
-  const known = products.flatMap(item => item.id === 'polar' ? [{"color": "Terracota", "hex": "#b16b4a"}, {"color": "Arena", "hex": "#cab99c"}, {"color": "Azul petróleo", "hex": "#2e6670"}, {"color": "Mostaza", "hex": "#bf923d"}] : item.fabrics).sort((a,b) => b.color.length - a.color.length);
-  const color = known.find(fabric => title.includes(normalize(fabric.color)));
-  if (color) return color.hex;
-  const original = products.find(item => item.id === product.localId);
-  return original?.fabrics.find(fabric => variant.sku === 'sofacama-' + product.localId + '-' + fabric.id)?.hex || '#cab99c';
+  const color = liveFabricColors.find(([name]) => title.includes(normalize(name)));
+  return color ? color[1] : '#cab99c';
 }
 function liveVariantControls(product, host) {
   host.replaceChildren();
+  // Un modelo con una sola variante sin nombre ("Default Title" en Shopify) no muestra muestras.
+  if (product.variants.length === 1 && product.variants[0].title === 'Default Title') return;
   const label = document.createElement('p');
   label.className = 'fabric-label';
   label.textContent = 'Elige tela y color';
@@ -246,7 +248,7 @@ function renderLiveCatalog() {
     description?.remove();
     const variant = selectedLiveVariant(product);
     const photos = liveVariantPhotos(product, variant);
-    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, 900), product.title + ' · ' + liveVariantLabel(product, variant));
+    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, 900), product.title + (variant.title === 'Default Title' ? '' : ' · ' + liveVariantLabel(product, variant)));
     const choices = card.querySelector('.fabric-options');
     if (choices) liveVariantControls(product, choices);
     else if (product.variants.length > 1) {
@@ -260,7 +262,12 @@ function renderLiveCatalog() {
     const type = card.querySelector('.line-type');
     if (type) type.textContent = product.productType;
     card.querySelector('.product-meta')?.remove();
-    card.querySelector('.product-link')?.remove(); // se abre el producto desde la imagen
+    // Botón visible de compra: abre la ficha, donde se elige la tela y se paga.
+    const open = card.querySelector('.product-link');
+    if (open) {
+      open.textContent = 'Ver y comprar';
+      open.setAttribute('aria-label', 'Ver y comprar ' + product.title);
+    }
     card.querySelector('.view-product')?.remove(); // al pasar el mouse solo hace zoom la imagen
     updateBuyButton(card, variant.key);
     card.querySelectorAll('.buy-link').forEach(link => link.remove()); // el botón de compra solo se muestra dentro del producto
@@ -311,6 +318,11 @@ function renderLiveDetail() {
   const category = document.querySelector('#line-detail-category');
   if (category) category.textContent = product.lineName + ' · ' + product.productType;
   updateBuyButton(liveDialog.querySelector('.detail-copy'), variant.key, '.button.dark');
+  const ask = liveDialog.querySelector('#detail-whatsapp');
+  if (ask) {
+    const choice = variant.title === 'Default Title' ? '' : ' en ' + liveVariantLabel(product, variant);
+    ask.href = 'https://wa.me/573208442629?text=' + encodeURIComponent('Hola, quiero información sobre el ' + product.title + choice + '.');
+  }
 }
 liveGrid?.replaceChildren(); // Do not present an old static catalog as live data.
 document.querySelector('#search, #line-search')?.addEventListener('input', filterLiveCatalog);
@@ -397,7 +409,7 @@ if(slides.length) {
   document.addEventListener('visibilitychange',startRotation); startRotation();
 }
 if(document.body.dataset.page === 'inicio') {
-  const legacyPages = {coleccion:'sofacamas.html',nosotros:'nosotros.html',guia:'sofacamas.html#guia',inspiracion:'blog/index.html',blog:'blog/index.html'};
+  const legacyPages = {coleccion:'index.html#modelos',nosotros:'nosotros.html',inspiracion:'blog/index.html',blog:'blog/index.html'};
   const destination = legacyPages[window.location.hash.slice(1)];
   if(destination) window.location.replace(siteUrl(destination));
 }
@@ -433,7 +445,7 @@ const featuredGrid = document.querySelector('#featured-grid');
 if (featuredGrid) {
   const money = new Intl.NumberFormat('es-CO', {style:'currency', currency:'COP', maximumFractionDigits:0});
   window.addEventListener('shopify:updated', () => {
-    const items = shopifyLiveProducts.filter(product => product.line === 'sofacamas').slice(0, 4);
+    const items = shopifyLiveProducts.filter(product => product.line === 'sofacamas').slice(0, 8);
     featuredGrid.replaceChildren();
     for (const product of items) {
       const variant = product.variants[0];
