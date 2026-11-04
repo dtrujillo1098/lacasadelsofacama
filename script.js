@@ -54,14 +54,7 @@ document.querySelector('#cart-explore')?.addEventListener('click', () => {
 });
 
 const categoryPages = [
-  {name:'Sofacamas',file:'sofacamas.html'},
-  {name:'Salas',file:'salas.html'},
-  {name:'Camas',file:'camas.html'},
-  {name:'Comedores',file:'comedores.html'},
-  {name:'Aparadores y consolas',file:'aparadores.html'},
-  {name:'Escritorios',file:'escritorios.html'},
-  {name:'Piezas auxiliares',file:'piezas-auxiliares.html'},
-  {name:'Tocadores',file:'tocadores.html'}
+  {name:'Sofacamas',file:'sofacamas.html'}
 ];
 const allSearchProducts = [];
 const searchDialog = document.querySelector('#search-dialog');
@@ -404,7 +397,7 @@ if(slides.length) {
   document.addEventListener('visibilitychange',startRotation); startRotation();
 }
 if(document.body.dataset.page === 'inicio') {
-  const legacyPages = {coleccion:'sofacamas.html',salas:'salas.html','sillas-auxiliares':'salas.html?sub=sillas-auxiliares',camas:'camas.html',nosotros:'nosotros.html',guia:'sofacamas.html#guia',inspiracion:'blog/index.html',blog:'blog/index.html'};
+  const legacyPages = {coleccion:'sofacamas.html',nosotros:'nosotros.html',guia:'sofacamas.html#guia',inspiracion:'blog/index.html',blog:'blog/index.html'};
   const destination = legacyPages[window.location.hash.slice(1)];
   if(destination) window.location.replace(siteUrl(destination));
 }

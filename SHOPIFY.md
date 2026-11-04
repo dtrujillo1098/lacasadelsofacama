@@ -10,8 +10,8 @@ al token. Un producto activo sin publicación en ese canal no será visible.
 
 Los títulos, descripciones, fotos, variantes, precios y disponibilidad se leen
 directamente de Shopify. Las altas y retiradas también se reflejan. La categoría
-de navegación se determina por el tipo de producto o sus etiquetas: sofacama,
-sala/sofá, silla/poltrona y cama/cabecero. Las etiquetas compacto, amplio y color
+de navegación se determina por el tipo de producto o sus etiquetas: este sitio
+solo muestra sofacamas. Las etiquetas compacto, amplio y color
 alimentan los filtros de sofacamas. Productos de otras categorías no se muestran.
 
 Los archivos catalog.js, new-lines.js y precios.json quedan como material
