@@ -284,12 +284,6 @@ function renderLiveCatalog() {
     const type = card.querySelector('.line-type');
     if (type) type.textContent = product.productType;
     card.querySelector('.product-meta')?.remove();
-    // Botón visible de compra: abre la ficha, donde se elige la tela y se paga.
-    const open = card.querySelector('.product-link');
-    if (open) {
-      open.textContent = 'Ver y comprar';
-      open.setAttribute('aria-label', 'Ver y comprar ' + product.title);
-    }
     card.querySelector('.view-product')?.remove(); // al pasar el mouse solo hace zoom la imagen
     updateBuyButton(card, variant.key);
     card.querySelectorAll('.buy-link').forEach(link => link.remove()); // el botón de compra solo se muestra dentro del producto

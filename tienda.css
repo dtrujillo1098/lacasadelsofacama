@@ -77,7 +77,7 @@ body.vista-cama .foto-cama{opacity:1}
 @media(hover:hover){.featured-card:hover .foto-cama,.product-card .product-image:hover .foto-cama{opacity:1}}
 .featured-card h3,.product-card h3{font-size:20px;font-weight:700;line-height:1.15;margin:12px 0 2px;letter-spacing:-.01em}
 .featured-price,.product-card .product-price,.product-card .line-meta strong{font:600 16px/1.3 var(--texto);color:var(--tinta);margin:0}
-.product-card{background:none;border:0;padding:0}
+.product-card{display:flex;flex-direction:column;height:100%;background:none;border:0;padding:0}
 .product-card .product-title{display:block;margin:0}
 .product-card .fabric-label,.product-card .fabric-selected{display:none}
 .product-card .fabric-options{margin:8px 0 6px}
@@ -261,11 +261,19 @@ footer .logo7-t1,footer .logo7-t2,footer .logo7-t3{color:#fff}
 .portada-acciones .boton:not(.boton-claro){background:var(--noche)}
 .visita .portada-acciones .boton:not(.boton-claro){background:var(--mostaza);color:var(--noche-2)}
 .guide-grid article{border-top-color:var(--noche)}
+/* Los títulos del catálogo pasan del azul a un carbón cálido de la paleta editorial. */
+body.landing main h2,body.landing main h3,body.landing main .product-title h3,body.landing main .featured-card h3{color:#4a382f!important}
 #product-dialog .fabric-choices{align-items:center}#product-dialog .fabric-choice{flex:0 0 34px;line-height:0}
 
 /* Recorrido de compra: botón en cada tarjeta, ficha con compra fija en móvil, cierre y barra móvil */
-.product-card .product-link{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;margin-top:12px;padding:0 12px;border:0;border-radius:6px;background:var(--noche);color:#fff;font:600 15px/1 var(--texto);cursor:pointer}
-.product-card .product-link:hover{background:var(--hover);text-decoration:none}
+.product-card .product-price{display:inline-flex;align-items:center;width:calc(55% - 8px);min-height:46px}
+.product-card .product-link{display:inline-flex;align-items:center;justify-content:center;width:calc(45% - 8px);min-height:46px;margin:12px 0 0 12px;padding:0 12px;border:1px solid rgba(74,56,47,.16);border-radius:999px;background:#f1c98f;color:#2c211d;font:600 15px/1 var(--texto);cursor:pointer;box-shadow:0 8px 18px rgba(74,56,47,.10);transition:background .2s ease,box-shadow .2s ease,transform .2s ease;vertical-align:middle}
+.product-card .product-link:hover{background:#fff5e7;color:#2c211d;text-decoration:none;box-shadow:0 10px 22px rgba(74,56,47,.16);transform:translateY(-1px)}
+.product-card .product-link,.product-card .purchase-row .buy-link{display:none!important}
+@media(max-width:700px){
+  .product-card .product-price{display:flex;width:100%;min-height:0}
+  .product-card .product-link{display:flex;width:100%;margin:12px 0 0}
+}
 #product-dialog .detail-whatsapp{width:100%;margin-top:10px}
 #product-dialog .detail-nota{font-size:14px;line-height:1.5;color:var(--gris);margin:12px 0 0}
 #product-dialog #back-to-catalog{box-shadow:none;min-height:44px;margin-top:4px;text-decoration:underline;text-underline-offset:4px}
@@ -297,15 +305,12 @@ footer .logo7-t1,footer .logo7-t2,footer .logo7-t3{color:#fff}
 }
 
 /* Catálogo: modelos destacados (Runa y Rubí), aviso de acabado original y fotos de estudio */
-#products>.product-card.destacado{grid-column:span 2}
 @media(max-width:1100px) and (min-width:701px){
   #products{grid-template-columns:repeat(6,minmax(0,1fr))}
   #products>.product-card{grid-column:span 2}
-  #products>.product-card.destacado{grid-column:span 3}
 }
-#products .destacado .product-image{aspect-ratio:3/2}
+#products .destacado .product-image{aspect-ratio:1}
 #products .destacado .product-image img{object-position:center 64%}
-#products .destacado .product-title h3{font-size:clamp(22px,2vw,28px)}
 .foto-acabado{position:absolute;left:10px;bottom:10px;z-index:2;max-width:calc(100% - 20px);padding:5px 9px;border-radius:4px;background:rgba(255,255,255,.92);color:var(--tinta);font:500 12px/1.25 var(--texto);text-align:left;pointer-events:none}
 @media(max-width:700px){.foto-acabado{left:6px;bottom:6px;max-width:calc(100% - 12px);padding:4px 7px;font-size:12px}}
 #product-dialog .fabric-view-note{font-size:14px!important;line-height:1.45!important;color:var(--gris);margin:6px 0 0}
@@ -402,3 +407,17 @@ body.landing .header.sobre-foto:not(:has(#main-nav.is-open)) :is(#search-toggle,
   .escena-pie a{grid-column:2;grid-row:1;min-height:32px}
 }
 @media(prefers-reduced-motion:reduce){.escena-cama,.escena-salida,.escena-tela::before,body.landing .header{transition:none}}
+
+/* El logo queda centrado en la portada y la línea superior respira mejor. */
+body.landing .header{justify-content:center}
+body.landing .header .brand-logo.logo7{position:absolute;left:50%;transform:translateX(-50%);margin:0}
+body.landing .header .logo7-t1{transform:translateY(4px)}
+body.landing .header .logo7-text{align-items:flex-start;text-align:left}
+body.landing .header .header-actions{position:absolute;right:var(--margen);margin-left:0}
+@media(max-width:960px){
+  body.landing .header .menu-toggle{position:absolute;left:8px}
+  body.landing .header .header-actions{right:12px}
+}
+@media(min-width:961px){
+  body.landing .header .brand-logo.logo7{left:var(--margen);transform:none}
+}
