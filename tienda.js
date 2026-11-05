@@ -1,4 +1,4 @@
-// Vista Sofá / Cama y comparador de la portada.
+// Vista Sofá / Cama del catálogo y barra fija de compra en móvil.
 (function(){
   const esCama = url => /abiert|cama-abierta|-cama\.|extension-frente/.test(new URL(url).pathname.split('/').pop());
   function fotoCama(product, variant){
@@ -11,7 +11,7 @@
     if (!foto) return;
     const img = new Image();
     img.className = 'foto-cama'; img.alt = ''; img.loading = 'lazy';
-    img.src = liveImageUrl(product, foto.url, 900);
+    img.src = liveImageUrl(product, foto.url, marco.closest('.destacado') ? 1400 : 900);
     marco.append(img);
   }
   function decorar(){
@@ -53,25 +53,5 @@
       const el = document.querySelector(sel);
       if (el) observador.observe(el);
     });
-  }
-
-  const comparador = document.querySelector('.comparador');
-  if (comparador) {
-    const rango = comparador.querySelector('input');
-    const poner = v => comparador.style.setProperty('--pos', v + '%');
-    rango.addEventListener('input', () => poner(rango.value));
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const inicio = performance.now();
-      let tocado = false;
-      rango.addEventListener('pointerdown', () => { tocado = true; }, {once:true});
-      rango.addEventListener('keydown', () => { tocado = true; }, {once:true});
-      (function paso(t){
-        if (tocado) return;
-        const p = Math.min((t - inicio) / 1800, 1);
-        const v = 50 - 22 * Math.sin(p * Math.PI);
-        poner(v); rango.value = v;
-        if (p < 1) requestAnimationFrame(paso);
-      })(inicio + 400);
-    }
   }
 })();
