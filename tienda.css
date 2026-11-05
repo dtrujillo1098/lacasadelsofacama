@@ -49,24 +49,15 @@ footer .brand-logo img{filter:brightness(0) invert(1)!important}
 .boton-claro{background:none;color:var(--tinta);box-shadow:inset 0 0 0 1.5px var(--tinta)}
 .boton-claro:hover{background:var(--tinta);color:#fff}
 
-/* Portada: comparador sofá / cama */
+/* Portada: texto y foto del sofá */
 .portada{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center;gap:clamp(24px,4vw,64px);max-width:var(--ancho);margin:0 auto;padding:clamp(24px,4vw,56px) var(--margen)}
 .portada h1{font-size:clamp(46px,6.6vw,104px);line-height:.94;letter-spacing:-.04em;font-weight:800;margin:0}
 .portada h1 span{display:block}
 .portada h1 .noche{color:var(--noche);opacity:.55}
 .portada-texto>p{font-size:clamp(17px,1.5vw,20px);color:var(--gris);max-width:30em;margin:22px 0 28px}
 .portada-acciones{display:flex;flex-wrap:wrap;gap:12px}
-.comparador{position:relative;aspect-ratio:1/1;max-height:min(76vh,760px);width:100%;overflow:hidden;background:#ddd;--pos:50%;touch-action:pan-y;border-radius:4px}
-.comparador img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 70%;user-select:none;pointer-events:none}
-.comparador .sofa{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
-.comparador input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;z-index:3}
-.comparador .linea{position:absolute;top:0;bottom:0;left:var(--pos);width:3px;margin-left:-1.5px;background:#fff;z-index:2;pointer-events:none}
-.comparador .tirador{position:absolute;top:58%;left:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:var(--noche);color:#fff;display:grid;place-items:center;font-size:20px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
-.comparador input:focus-visible~.linea .tirador{outline:3px solid var(--mostaza);outline-offset:2px}
-.comparador .rotulo{position:absolute;top:14px;z-index:2;padding:6px 12px;background:#fff;color:var(--tinta);font-weight:600;font-size:14px;border-radius:4px;pointer-events:none}
-.comparador .r-sofa{left:14px}.comparador .r-cama{right:14px}
-.comparador-ayuda{font-size:14px;color:var(--gris);margin:10px 0 0}
-@media(max-width:860px){.portada{grid-template-columns:1fr}.comparador{max-height:none}.portada h1{font-size:clamp(46px,14vw,76px)}}
+.portada-foto{display:block;width:100%;height:auto;aspect-ratio:1/1;max-height:min(76vh,760px);object-fit:cover;object-position:center 70%;background:#ddd;border-radius:4px}
+@media(max-width:860px){.portada{grid-template-columns:1fr}.portada-foto{max-height:none}.portada h1{font-size:clamp(46px,14vw,76px)}}
 
 /* Cuadrícula de productos: portada y catálogo */
 .vista{display:inline-flex;padding:4px;background:#e4e7e3;border-radius:8px}
@@ -206,7 +197,6 @@ h1,h2,h3,.detail-copy h2,#detail-title{font-weight:500;letter-spacing:-.005em}
 .boton-claro:hover{background:var(--tinta);color:#fff}
 .vista button[aria-pressed=true]{background:var(--noche);color:#fff}
 .vista{background:#dfe6ee}
-.comparador .tirador{background:var(--noche)}
 .respaldo{display:flex;align-items:center;gap:12px;margin:26px 0 0!important;font-size:15px!important;color:var(--tinta)!important}
 .respaldo img{height:42px;width:auto;flex:none}
 .hechos{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--linea);border-block:1px solid var(--linea)}
@@ -281,9 +271,13 @@ footer .logo7-t1,footer .logo7-t2,footer .logo7-t3{color:#fff}
 #product-dialog #back-to-catalog{box-shadow:none;min-height:44px;margin-top:4px;text-decoration:underline;text-underline-offset:4px}
 #product-dialog #back-to-catalog:hover{background:none;text-decoration-thickness:2px}
 @media(max-width:800px){
-  #product-dialog .detail-copy .purchase-row{position:sticky;bottom:0;z-index:3;flex-direction:row!important;align-items:center!important;gap:14px;margin:18px 0 0;padding:12px 0;background:#fff;box-shadow:0 -1px 0 var(--linea)}
+  /* La columna de la ficha nunca crece más que el diálogo (un precio largo la ensanchaba) */
+  #product-dialog .detail-layout{grid-template-columns:minmax(0,1fr)}
+  #product-dialog .detail-copy{min-width:0}
+  /* Precio y Comprar en una fila; si no caben, Comprar baja a una fila propia a todo el ancho */
+  #product-dialog .detail-copy .purchase-row{position:sticky;bottom:0;z-index:3;flex-direction:row!important;flex-wrap:wrap;align-items:center!important;gap:10px 14px;margin:18px 0 0;padding:12px 0;background:#fff;box-shadow:0 -1px 0 var(--linea)}
   #product-dialog .detail-copy .purchase-row .product-price{flex:none;width:auto;margin:0;font-size:22px}
-  #product-dialog .purchase-row a.buy-link{flex:1;min-height:50px}
+  #product-dialog .purchase-row a.buy-link{flex:1 1 6.5rem;min-height:50px;padding-inline:14px;margin:0}
 }
 .enlace-texto{display:inline-flex;align-items:center;min-height:44px;color:var(--tinta);font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .enlace-texto:hover{text-decoration-thickness:2px}
@@ -300,4 +294,40 @@ footer .logo7-t1,footer .logo7-t2,footer .logo7-t3{color:#fff}
   body.con-barra .whatsapp-float{display:none}
   body.modal-open .barra-compra{display:none!important}
   .landing footer{padding-bottom:96px}
+}
+
+/* Catálogo: modelos destacados (Runa y Rubí), aviso de acabado original y fotos de estudio */
+#products>.product-card.destacado{grid-column:span 2}
+@media(max-width:1100px) and (min-width:701px){
+  #products{grid-template-columns:repeat(6,minmax(0,1fr))}
+  #products>.product-card{grid-column:span 2}
+  #products>.product-card.destacado{grid-column:span 3}
+}
+#products .destacado .product-image{aspect-ratio:3/2}
+#products .destacado .product-image img{object-position:center 64%}
+#products .destacado .product-title h3{font-size:clamp(22px,2vw,28px)}
+.foto-acabado{position:absolute;left:10px;bottom:10px;z-index:2;max-width:calc(100% - 20px);padding:5px 9px;border-radius:4px;background:rgba(255,255,255,.92);color:var(--tinta);font:500 12px/1.25 var(--texto);text-align:left;pointer-events:none}
+@media(max-width:700px){.foto-acabado{left:6px;bottom:6px;max-width:calc(100% - 12px);padding:4px 7px;font-size:12px}}
+#product-dialog .fabric-view-note{font-size:14px!important;line-height:1.45!important;color:var(--gris);margin:6px 0 0}
+#products .foto-estudio .product-image{background:#ddd5c9;isolation:isolate}
+#products .foto-estudio .product-image img{mix-blend-mode:multiply}
+#product-dialog.foto-estudio .gallery-stage{background:#ddd5c9;isolation:isolate}
+#product-dialog.foto-estudio .gallery-stage>img{background:transparent;mix-blend-mode:multiply}
+#product-dialog.foto-estudio .photo-thumbnails img{mix-blend-mode:multiply}
+
+/* Legibilidad: ningún texto funcional por debajo de 12 px y verde de WhatsApp con texto oscuro (7.2:1) */
+.utility-bar .utility-message{font-size:12px;letter-spacing:.02em}
+.guide-grid p{font-size:15px;line-height:1.6}
+#product-dialog #photo-caption,#product-dialog .fabric-label{font-size:13px}
+#product-dialog .fabric-selected{font-size:14px}
+footer .footer-top p,footer .footer-top nav,footer .footer-top nav a,footer .footer-legal,footer .footer-legal a,footer .footer-contact a{font-size:14px}
+footer .footer-bottom{font-size:13px}
+.whatsapp-float{color:#08311b}
+/* Pie en móvil: una sola columna para que contacto y enlaces legales no se crucen con el texto a 14 px */
+@media(max-width:600px){
+  footer{grid-template-columns:minmax(0,1fr)}
+  footer .footer-legal{grid-column:1;grid-row:2;align-items:flex-start;text-align:left}
+  footer .footer-top .brand-logo{grid-row:3}
+  footer .footer-bottom{grid-row:4}
+  footer .marca-madre{grid-column:1;grid-row:5}
 }

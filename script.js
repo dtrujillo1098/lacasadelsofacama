@@ -158,6 +158,16 @@ function liveImageUrl(product, url, width) {
   sized.searchParams.set('width', width);
   return sized.toString();
 }
+// En varios modelos todas las telas de Shopify comparten la foto del acabado original:
+// la foto no muestra la tela elegida y la tarjeta y la ficha lo avisan.
+function liveSharedPhoto(product) {
+  const first = product.variants[0]?.image?.url;
+  return product.variants.length > 1 && Boolean(first) && product.variants.every(variant => variant.image?.url === first);
+}
+// Modelos que abren el catálogo con tarjeta grande (los que tienen foto propia por color).
+const liveDestacados = ['gid://shopify/Product/15461603836038', 'gid://shopify/Product/15461604098182']; // Runa, Rubí
+// Modelos con foto de estudio en fondo blanco: el CSS funde el fondo con el de la tarjeta.
+const liveFotoEstudio = product => /^sofacama-soul-/.test(product.handle);
 function setLiveImage(image, url, alt) {
   if (!image) return;
   image.hidden = !url;
@@ -248,13 +258,25 @@ function renderLiveCatalog() {
     description?.remove();
     const variant = selectedLiveVariant(product);
     const photos = liveVariantPhotos(product, variant);
-    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, 900), product.title + (variant.title === 'Default Title' ? '' : ' · ' + liveVariantLabel(product, variant)));
+    const destacado = liveDestacados.includes(product.id);
+    card.classList.toggle('destacado', destacado);
+    card.classList.toggle('foto-estudio', liveFotoEstudio(product));
+    // El texto alternativo describe la foto que se ve (texto de Shopify), no la tela elegida.
+    setLiveImage(card.querySelector('img'), liveImageUrl(product, photos[0]?.url, destacado ? 1400 : 900), photos[0]?.altText || product.title);
     const choices = card.querySelector('.fabric-options');
     if (choices) liveVariantControls(product, choices);
     else if (product.variants.length > 1) {
       const host = document.createElement('div');
       liveVariantControls(product, host);
       card.querySelector('.line-meta').before(host);
+    }
+    if (liveSharedPhoto(product)) {
+      const aviso = document.createElement('span');
+      aviso.className = 'foto-acabado';
+      aviso.id = 'acabado-' + product.handle;
+      aviso.textContent = 'Foto en acabado original';
+      card.querySelector('.product-image')?.append(aviso);
+      card.querySelector('.fabric-choices')?.setAttribute('aria-describedby', aviso.id);
     }
     const meta = card.querySelector('.product-meta span, .line-meta span');
     const hasColorPicker = Boolean(choices) || product.variants.length > 1;
@@ -314,7 +336,11 @@ function renderLiveDetail() {
   const caption = document.querySelector('#photo-caption');
   if (caption) caption.textContent = photos.length ? (livePhotoIndex + 1) + ' / ' + photos.length : 'Sin fotografías para esta variante';
   const note = document.querySelector('#fabric-view-note');
-  if (note) note.hidden = true;
+  if (note) {
+    note.hidden = !liveSharedPhoto(product);
+    note.textContent = 'Las fotos muestran el acabado original, no la tela elegida.';
+  }
+  liveDialog.classList.toggle('foto-estudio', liveFotoEstudio(product));
   const category = document.querySelector('#line-detail-category');
   if (category) category.textContent = product.lineName + ' · ' + product.productType;
   updateBuyButton(liveDialog.querySelector('.detail-copy'), variant.key, '.button.dark');
