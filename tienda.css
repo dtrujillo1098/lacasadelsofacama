@@ -331,3 +331,74 @@ footer .footer-bottom{font-size:13px}
   footer .footer-bottom{grid-row:4}
   footer .marca-madre{grid-column:1;grid-row:5}
 }
+
+/* Portada: el Rubí en la misma sala ocupa el frente; cerrado al inicio, abierto al pasar el mouse, en 4 telas */
+.escena{margin:0;min-width:0}
+.escena-marco{position:relative;overflow:hidden;border-radius:4px;background:#ddd}
+.escena-marco img{display:block;width:100%;height:auto;aspect-ratio:1/1;max-height:min(68vh,680px);object-fit:cover;object-position:center 70%}
+.escena-marco .escena-cama,.escena-marco .escena-salida{position:absolute;inset:0;height:100%;max-height:none}
+/* Cerrado al inicio; abierto como cama al pasar el mouse por el banner o, en pantallas táctiles, al tocar la foto */
+.escena-cama{opacity:0;transition:opacity .4s cubic-bezier(.23,1,.32,1)}
+.escena-marco.abierto .escena-cama{opacity:1}
+@media(hover:hover){.escena:hover .escena-cama{opacity:1}}
+@media(hover:none){.escena-marco{cursor:pointer}}
+.escena-pista-toque{display:none}
+@media(hover:none){.escena-pista-mouse{display:none}.escena-pista-toque{display:inline}}
+.escena-salida{z-index:2;pointer-events:none;transition:opacity .3s cubic-bezier(.23,1,.32,1)}
+.escena-salida.fuera{opacity:0}
+.escena-controles{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:12px}
+.escena-ajustes{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.escena-telas{display:flex;gap:2px}
+.escena-tela{position:relative;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+.escena-tela::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--tela);box-shadow:inset 0 0 0 1px rgba(24,35,58,.2);transition:transform .16s ease-out}
+.escena-tela:active::before{transform:scale(.92)}
+.escena-tela[aria-pressed=true]::after{content:"";position:absolute;inset:3px;border-radius:50%;border:2px solid var(--noche)}
+.escena-tela:focus-visible{outline:3px solid var(--mostaza);outline-offset:1px}
+.escena-pie{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin:0;font-size:15px;color:var(--gris)}
+/* La foto sube hasta la barra superior por detrás del encabezado, que va transparente mientras
+   la página está arriba (tienda.js le pone .sobre-foto) y se vuelve blanco al bajar o al abrir el menú. */
+body.landing{--cabecera:88px}
+@media(max-width:960px){body.landing{--cabecera:64px}}
+body.landing .toldo{display:none}
+body.landing .portada{margin-top:calc(-1 * var(--cabecera))}
+body.landing .header{transition:background-color .25s ease,border-color .25s ease}
+body.landing .header.sobre-foto:not(:has(#main-nav.is-open)){background:transparent!important;border-bottom-color:rgba(24,35,58,.1)}
+body.landing .header.sobre-foto:not(:has(#main-nav.is-open)) :is(#search-toggle,.menu-toggle){width:44px;height:44px;min-width:0;padding:0;background:rgba(255,255,255,.9);border-radius:50%;box-shadow:0 2px 10px rgba(20,31,56,.12)}
+/* Hasta 860 px la foto va primero, de borde a borde, y el texto sigue debajo */
+@media(max-width:860px){
+  .portada{padding-top:0}
+  .portada .escena{order:-1;margin-inline:calc(-1 * var(--margen))}
+  .escena-marco{border-radius:0;background:none}
+  .escena-marco img{max-height:none;aspect-ratio:10/9;object-position:50% 25%}
+  .escena-controles{padding-inline:var(--margen)}
+}
+/* De 601 a 860 px la foto es más apaisada */
+@media(min-width:601px) and (max-width:860px){.escena-marco img{aspect-ratio:4/3;object-position:50% 60%}}
+/* Hasta 860 px las telas van sobre la foto, abajo a la izquierda, y el pie queda debajo */
+@media(max-width:860px){
+  .escena{display:grid;grid-template-columns:minmax(0,1fr)}
+  .escena-marco{grid-area:1/1}
+  .escena-controles{display:contents}
+  .escena-ajustes{grid-area:1/1;align-self:end;justify-self:start;z-index:3;margin:14px var(--margen);padding:4px;gap:6px;background:rgba(255,255,255,.94);border-radius:12px;box-shadow:0 4px 16px rgba(20,31,56,.16)}
+  .escena-pie{grid-row:2;margin-top:10px;padding-inline:var(--margen)}
+}
+/* Desde 861 px la foto ocupa todo el frente: llega a los bordes derecho e inferior y se funde
+   con el fondo a la izquierda, donde va el titular. Deja ver el inicio de la sección siguiente
+   para que se note que hay más abajo. */
+@media(min-width:861px){
+  .portada{position:relative;display:flex;align-items:center;max-width:none;min-height:clamp(600px,calc(100svh - 86px),900px);padding:calc(var(--cabecera,0px) + clamp(32px,5vh,64px)) calc(max(0px,(100% - var(--ancho))/2) + var(--margen)) clamp(40px,6vh,72px);overflow:hidden;isolation:isolate}
+  .portada-texto{position:relative;z-index:2;width:min(100%,560px,50vw)}
+  .portada h1 span{white-space:nowrap}
+  /* Halo del color del fondo: el texto se sigue leyendo donde pasa por encima del brazo del sofá */
+  .portada-texto p{text-shadow:0 0 4px var(--dia),0 0 12px var(--dia),0 0 22px var(--dia)}
+  .portada .escena{position:absolute;top:0;right:0;bottom:0;left:26%;z-index:0}
+  .escena-marco{position:absolute;inset:0;border-radius:0;background:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 34%);mask-image:linear-gradient(90deg,transparent 0,#000 34%)}
+  .escena-marco img{height:100%;max-height:none;aspect-ratio:auto;object-position:58% 62%}
+  .escena-controles{position:absolute;z-index:3;left:34%;bottom:32px;flex-direction:row;align-items:center;gap:14px;margin:0;padding:6px 18px 6px 6px;background:rgba(255,255,255,.95);border-radius:14px;box-shadow:0 6px 20px rgba(20,31,56,.16)}
+  .escena-pie{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:12px;font-size:14px;line-height:1.35}
+  .escena-pie>span{display:contents}
+  .escena-estado{font-weight:600;color:var(--tinta)}
+  .escena-pista-mouse,.escena-pista-toque{grid-column:1/-1;grid-row:2;font-size:13px}
+  .escena-pie a{grid-column:2;grid-row:1;min-height:32px}
+}
+@media(prefers-reduced-motion:reduce){.escena-cama,.escena-salida,.escena-tela::before,body.landing .header{transition:none}}
