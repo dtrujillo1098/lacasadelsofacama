@@ -7,24 +7,24 @@
 
     const slides = [
       {
-        clase: 'hero-slide--day', imagen: './assets/portada/hero-magazine-ivory.png',
+        clase: 'hero-slide--day', imagen: './assets/portada/hero-magazine-ivory.webp',
         alt: 'Sofacama bouclé marfil en una sala luminosa de estilo editorial', etiqueta: 'Colección Casa Atelier',
-        titulo: 'Tu sala también puede ser una historia.', texto: 'Sofacamas que convierten cada rincón en el lugar favorito de la casa.', enlace: 'Ver modelos'
+        titulo: 'Tu sala también puede ser una historia.', corto: 'Tu sala, con historia.', texto: 'Sofacamas que convierten cada rincón en el lugar favorito de la casa.', enlace: 'Ver modelos'
       },
       {
-        clase: 'hero-slide--night', imagen: './assets/portada/hero-magazine-olive.png',
+        clase: 'hero-slide--night', imagen: './assets/portada/hero-magazine-olive.webp',
         alt: 'Sofacama verde oliva de terciopelo en un salón sofisticado al anochecer', etiqueta: 'Diseño para quedarse',
-        titulo: 'Una pieza que cambia el ambiente.', texto: 'Texturas, proporciones y color para una casa con personalidad.', enlace: 'Descubrir la colección'
+        titulo: 'Una pieza que cambia el ambiente.', corto: 'Diseño que se queda.', texto: 'Texturas, proporciones y color para una casa con personalidad.', enlace: 'Descubrir la colección'
       },
       {
-        clase: 'hero-slide--bed', imagen: './assets/portada/hero-magazine-terracotta.png', alinea: 'hero-slide--copy-right',
+        clase: 'hero-slide--bed', imagen: './assets/portada/hero-magazine-terracotta.webp', alinea: 'hero-slide--copy-right',
         alt: 'Sofacama terracota abierto como cama en un dormitorio de revista', etiqueta: 'Sofá de día. Cama de noche.',
-        titulo: 'Cuando llega la noche, se transforma.', texto: 'Más espacio para descansar, recibir y vivir bonito todos los días.', enlace: 'Cómo elegir el tuyo'
+        titulo: 'Cuando llega la noche, se transforma.', corto: 'Se abre. Descansas.', texto: 'Más espacio para descansar, recibir y vivir bonito todos los días.', enlace: 'Cómo elegir el tuyo'
       },
       {
-        clase: 'hero-slide--apartment', imagen: './assets/portada/hero-magazine-monaco.png',
+        clase: 'hero-slide--apartment', imagen: './assets/portada/hero-magazine-monaco.webp',
         alt: 'Sofacama Mónaco en un apartamento de lujo en Bogotá', etiqueta: 'Mónaco · Interiorismo bogotano',
-        titulo: 'El confort también puede ser arquitectura.', texto: 'Una pieza que se integra al espacio y deja que la casa hable.', enlace: 'Ver el Mónaco'
+        titulo: 'El confort también puede ser arquitectura.', corto: 'Hecho para tu espacio.', texto: 'Una pieza que se integra al espacio y deja que la casa hable.', enlace: 'Ver el Mónaco'
       }
     ];
 
@@ -35,9 +35,9 @@
         <div class="hero-slide-shade" aria-hidden="true"></div>
         <div class="hero-slide-content">
           <p class="hero-slide-kicker">${slide.etiqueta}</p>
-          <h1>${slide.titulo}</h1>
+          <h1><span class="hero-largo">${slide.titulo}</span><span class="hero-corto">${slide.corto}</span></h1>
           <p class="hero-slide-text">${slide.texto}</p>
-          <div class="hero-slide-actions portada-acciones"><a class="boton hero-slide-cta" href="#modelos">${slide.enlace}</a></div>
+          <div class="hero-slide-actions portada-acciones"><a class="boton hero-slide-cta" href="#modelos"><span class="hero-largo">${slide.enlace}</span><span class="hero-corto">Ver sofacamas</span></a></div>
         </div>
       </article>`).join('')}</div>
     </div>`;

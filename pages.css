@@ -262,9 +262,26 @@ body.landing .portada-magazine .hero-slide-kicker{color:#f1c98f}
   .portada-magazine .hero-slide-cta{min-height:44px;padding:0 20px;font-size:14px}
 }
 @media(max-width:560px){
-  body.landing .portada.portada-magazine{min-height:88svh}
-  .portada-magazine .hero-slide-content,.portada-magazine .hero-slide--copy-right .hero-slide-content{top:82px;left:16px;right:16px;width:calc(100% - 32px)}
+  body.landing .portada.portada-magazine{min-height:0;height:min(76svh,580px)}
+  .portada-magazine .hero-slide-content,.portada-magazine .hero-slide--copy-right .hero-slide-content{top:96px;bottom:32px;left:16px;right:16px;width:calc(100% - 32px);transform:none;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start}
   .portada-magazine .hero-slide h1{max-width:360px;font-size:clamp(31px,9.5vw,48px)}
   .portada-magazine .hero-slide-text{max-width:330px;font-size:14px}
   .portada-magazine .hero-slide-cta{min-height:42px;padding:0 18px;font-size:13px}
+}
+
+/* Textos del banner alineados a la izquierda en móvil y tableta */
+@media(max-width:960px){
+  .portada-magazine .hero-slide-content,.portada-magazine .hero-slide--copy-right .hero-slide-content{text-align:left}
+  .portada-magazine .hero-slide-kicker,.portada-magazine .hero-slide-actions{justify-content:flex-start}
+  .portada-magazine .hero-slide h1,.portada-magazine .hero-slide-text{margin-left:0;margin-right:0}
+}
+
+/* Banner móvil: texto corto y un solo llamado a la acción */
+.portada-magazine .hero-corto{display:none}
+@media(max-width:560px){
+  .portada-magazine .hero-largo{display:none}
+  .portada-magazine .hero-corto{display:inline}
+  .portada-magazine .hero-slide-text{display:none}
+  .portada-magazine .hero-slide h1{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .portada-magazine .hero-slide-kicker{margin-bottom:18px;font-size:13px;letter-spacing:.16em}
 }
